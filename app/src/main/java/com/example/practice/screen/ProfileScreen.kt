@@ -1,4 +1,4 @@
-package com.example.practice
+package com.example.practice.screen
 
 
 import android.annotation.SuppressLint
@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -32,11 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.practice.pages.ChatPage
-import com.example.practice.pages.HomePage
-import com.example.practice.pages.PostPage
+import com.example.practice.NavItem
+import com.example.practice.R
 import com.example.practice.pages.ProfilePage
-import com.example.practice.pages.SettingsPage
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,7 +58,7 @@ fun ProfileScreen() {
                 title = {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween, // Space around all items
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -87,24 +83,24 @@ fun ProfileScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = Color(0xFFF3ECEC))
-                    .padding(8.dp), // Add padding around the row
-                horizontalArrangement = Arrangement.SpaceAround, // Distribute items evenly
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 navItemList.forEachIndexed { index, navItem ->
                     Box(
                         modifier = Modifier
-                            .size(52.dp) // Set the size for each navigation item
+                            .size(52.dp)
                             .background(
-                                color = if (selectedIndex == index) Color(0xFFB1CB90) // Selected color
+                                color = if (selectedIndex == index) Color(0xFFB1CB90)
                                 else Color(0xFFf9B77C), // Unselected color
                                 shape = CircleShape
                             )
                             .clickable(
-                                interactionSource = remember { MutableInteractionSource() }, // Disable ripple effect
-                                indication = null // Ensure no ripple is shown
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
                             ) {
-                                selectedIndex = index // Handle item selection
+                                selectedIndex = index
                             },
                         contentAlignment = Alignment.Center
                     ) {
@@ -130,10 +126,6 @@ fun ProfileScreen() {
 @Composable
 private fun ContentScreen(selectedIndex: Int) {
     when (selectedIndex) {
-        0 -> SettingsPage()
-        1 -> HomePage()
-        2 -> PostPage()
-        3 -> ChatPage()
         4 -> ProfilePage()
     }
 }

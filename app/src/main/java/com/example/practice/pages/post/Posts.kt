@@ -94,8 +94,7 @@ fun PostsCard() {
                     textAlign = TextAlign.Center,
                 )
             )
-            Row(
-            ){
+            Row{
                 Icon(
                     modifier = Modifier.size(20.dp),
                     painter = painterResource(R.drawable.heart_reatc),
