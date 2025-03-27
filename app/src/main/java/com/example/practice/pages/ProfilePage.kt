@@ -16,9 +16,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -46,23 +44,14 @@ import com.example.practice.R
 import com.example.practice.api.allRecipeData
 import com.example.practice.pages.post.PostsCard
 
-@Preview(showBackground = true)
 @Composable
-fun ProfilePage() {
-
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-
-    val topPaddingRatio = 64f / screenHeight.value
-    val dynamicTopPadding = screenHeight * topPaddingRatio
-
+fun ProfilePage(innerPadding: PaddingValues) {
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = dynamicTopPadding)
-            .background(Color.White)
-            .verticalScroll(rememberScrollState()),
+            .padding(innerPadding)
+            .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -70,15 +59,8 @@ fun ProfilePage() {
         FillTheProfile()
         Spacer(modifier = Modifier.height(13.dp))
         PostCollectsHistoryButton()
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-        ) {
-            PostCollectsHistory()
-        }
-        Spacer(modifier = Modifier.height(13.dp))
+        Spacer(modifier = Modifier.height(6.dp))
+        PostCollectsHistory()
     }
 
 }
@@ -249,7 +231,7 @@ fun FixedButton(
         onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(
             if (isSelected) Color(0xFFAFC988) else Color(0xFFF7B474)
-        ) ,
+        ),
         enabled = true, // Buttons are always enabled, selection is controlled via state
     ) {
         Text(
@@ -259,7 +241,7 @@ fun FixedButton(
                 lineHeight = 20.sp,
                 fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
                 fontWeight = FontWeight(400),
-                color = Color.Black ,
+                color = Color.Black,
                 textAlign = TextAlign.Center
             )
         )
@@ -296,27 +278,25 @@ fun PostCollectsHistoryButton() {
             onClick = { selectedButton = "History" }
         )
     }
-    
+
 }
 
-@Preview
+
 @Composable
 fun PostCollectsHistory() {
     LazyVerticalGrid(
+        modifier = Modifier
+            .padding(bottom = 6.dp),
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 72.dp)
     ) {
         items(allRecipeData) { item ->
             PostsCard()
         }
     }
 }
-
 
 
 @Composable

@@ -7,8 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,12 +34,31 @@ import com.example.practice.NavItem
 import com.example.practice.R
 import com.example.practice.pages.ProfilePage
 
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun ProfileScreen() {
+fun TopBar() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.drawer),
+            contentDescription = "Drawer"
+        )
+        Text(text = "Explore")
+        Text(text = "Followers") // New text item
+        Icon(
+            modifier = Modifier.padding(end = 10.dp),
+            painter = painterResource(id = R.drawable.search),
+            contentDescription = "Search",
+            tint = Color.Unspecified
+        )
+    }
+}
+
+@Composable
+fun BottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
+
     val navItemList = listOf(
         NavItem(icon = R.drawable.favorite, badgeCount = 0),
         NavItem(icon = R.drawable.home, badgeCount = 1),
@@ -48,85 +67,71 @@ fun ProfileScreen() {
         NavItem(icon = R.drawable.profile, badgeCount = 4),
     )
 
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color(0xFFF3ECEC))
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        navItemList.forEachIndexed { index, navItem ->
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .background(
+                        color = if (selectedIndex == index) Color(0xFFB1CB90)
+                        else Color(0xFFf9B77C), // Unselected color
+                        shape = CircleShape
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        onItemSelected(index)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+
+                Icon(
+                    painter = painterResource(id = navItem.icon),
+                    contentDescription = "Icon",
+                    tint = Color.Unspecified
+                )
+
+            }
+        }
+    }
+
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun ProfileScreen() {
+
     var selectedIndex by remember { mutableIntStateOf(4) }
 
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.drawer),
-                            contentDescription = "Drawer"
-                        )
-                        Text(text = "Explore")
-                        Text(text = "Followers") // New text item
-                        Icon(
-                            modifier = Modifier.padding(end = 10.dp),
-                            painter = painterResource(id = R.drawable.search),
-                            contentDescription = "Search",
-                            tint = Color.Unspecified
-                        )
-                    }
-                },
+                title = { TopBar() },
                 colors = TopAppBarDefaults.topAppBarColors(Color(0xFFf9B77C))
             )
         },
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = Color(0xFFF3ECEC))
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                navItemList.forEachIndexed { index, navItem ->
-                    Box(
-                        modifier = Modifier
-                            .size(52.dp)
-                            .background(
-                                color = if (selectedIndex == index) Color(0xFFB1CB90)
-                                else Color(0xFFf9B77C), // Unselected color
-                                shape = CircleShape
-                            )
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                selectedIndex = index
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
+        bottomBar = { BottomBar(selectedIndex) { index -> selectedIndex = index } }
 
-                        Icon(
-                            painter = painterResource(id = navItem.icon),
-                            contentDescription = "Icon",
-                            tint = Color.Unspecified
-                        )
-
-                    }
-                }
-            }
-        }
-
-    ) {
-
-        ContentScreen(selectedIndex)
+    ) { innerPadding ->
+        ContentScreen(selectedIndex, innerPadding)
     }
 }
 
 
 @Composable
-private fun ContentScreen(selectedIndex: Int) {
+private fun ContentScreen(selectedIndex: Int,innerPadding: PaddingValues) {
     when (selectedIndex) {
-        4 -> ProfilePage()
+        4 -> ProfilePage(innerPadding)
     }
 }
 
