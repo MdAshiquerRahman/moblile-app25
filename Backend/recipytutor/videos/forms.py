@@ -8,8 +8,6 @@ class VideoCommentForm(forms.ModelForm):
         fields = ['text']
 
 
-
-
 class VideoUploadForm(forms.ModelForm):
     class Meta:
         model = Video

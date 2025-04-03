@@ -5,7 +5,7 @@ from .forms import ImageUploadForm,ImageCommentForm
 
 def image_list(request):
     images = ImagePost.objects.all()
-    return render(request, 'images/image_list.html', {'images': images})
+    return render(request, 'image_list.html', {'images': images})
 
 @login_required
 def upload_image(request):
@@ -18,7 +18,7 @@ def upload_image(request):
             return redirect('image_list')
     else:
         form = ImageUploadForm()
-    return render(request, 'images/upload_image.html', {'form': form})
+    return render(request, 'upload_image.html', {'form': form})
 
 @login_required
 def add_image_comment(request, image_id):
@@ -33,3 +33,22 @@ def add_image_comment(request, image_id):
             return redirect('image_list')
     return redirect('image_list')
 
+@login_required
+def like_image(request, image_id):
+    image = get_object_or_404(ImagePost, id=image_id)
+    if request.user in image.likes.all():
+        image.likes.remove(request.user)
+    else:
+        image.likes.add(request.user)
+        image.dislikes.remove(request.user)  # Remove dislike if user liked
+    return redirect('image_list')
+
+@login_required
+def dislike_image(request, image_id):
+    image = get_object_or_404(ImagePost, id=image_id)
+    if request.user in image.dislikes.all():
+        image.dislikes.remove(request.user)
+    else:
+        image.dislikes.add(request.user)
+        image.likes.remove(request.user)  # Remove like if user disliked
+    return redirect('image_list')

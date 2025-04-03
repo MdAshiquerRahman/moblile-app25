@@ -38,7 +38,7 @@ def add_video_comment(request, video_id):
 
 def video_list(request):
     videos = Video.objects.all()
-    return render(request, 'videos/video_list.html', {'videos': videos})
+    return render(request, 'video_list.html', {'videos': videos})
 
 @login_required
 def upload_video(request):
@@ -51,4 +51,4 @@ def upload_video(request):
             return redirect('video_list')
     else:
         form = VideoUploadForm()
-    return render(request, 'videos/upload_video.html', {'form': form})
+    return render(request, 'upload_video.html', {'form': form})
