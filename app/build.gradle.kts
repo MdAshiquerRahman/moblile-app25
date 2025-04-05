@@ -51,6 +51,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,5 +73,20 @@ dependencies {
     implementation (libs.androidx.runtime.livedata)
 
     // firebase
-    implementation (libs.firebase.firestore.v2450)
+    implementation (libs.firebase.firestore)
+
+    // coil
+    implementation(libs.coil.compose)
+
+    // Retrofit
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.logging.interceptor)
+
+    // Navigation
+    implementation (libs.androidx.navigation.compose)
+
+    // Splash Screen
+    implementation (libs.androidx.core.splashscreen)
+
 }

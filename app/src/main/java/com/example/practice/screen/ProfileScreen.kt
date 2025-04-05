@@ -2,7 +2,6 @@ package com.example.practice.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -11,18 +10,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,28 +36,28 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.practice.R
 import com.example.practice.api.allRecipeData
 import com.example.practice.elements.FixedButton
 import com.example.practice.elements.UserProfile
 import com.example.practice.pages.post.RecipePostsCard
+import com.example.practice.viewmodel.AuthViewModel
 
 @Composable
-fun ProfileScreen(innerPadding: PaddingValues) {
+fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(innerPadding)
             .background(Color.White),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        UserNamePart()
+        UserNamePart("Null","Null")
         FillTheProfile()
         Spacer(modifier = Modifier.height(13.dp))
         PostCollectsHistoryButton()
@@ -68,18 +67,9 @@ fun ProfileScreen(innerPadding: PaddingValues) {
 
 }
 
-@Preview
+
 @Composable
-fun UserNamePart() {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
-
-    val boxWidthRatio = 110f / screenWidth.value
-    val boxHeightRatio = 110f / screenHeight.value
-    val boxDynamicWidth = screenWidth * boxWidthRatio
-    val boxDynamicHeight = screenHeight * boxHeightRatio
-
+fun UserNamePart(userName: String, userProfile: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,7 +77,7 @@ fun UserNamePart() {
             .background(color = Color(0xFFEFE7DC)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        UserProfile(boxDynamicHeight,boxDynamicWidth)
+        UserProfile(110.dp,110.dp, userProfile)
         Column(
             modifier = Modifier
                 .padding(vertical = 16.dp)
@@ -102,7 +92,7 @@ fun UserNamePart() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "User name",
+                    text = userName,
                     fontSize = screenRatioFontSize(20f),
                     fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
                     fontWeight = FontWeight(400),
