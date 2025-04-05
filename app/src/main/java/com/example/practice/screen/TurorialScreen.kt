@@ -1,53 +1,56 @@
 package com.example.practice.screen
 
 
-import android.net.Uri
-import android.view.View
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.media3.common.C
 import androidx.media3.common.MediaItem
-import androidx.media3.common.Player
-import androidx.media3.common.Timeline
-import androidx.media3.common.util.Log
 import com.example.practice.elements.FixedButton
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.SimpleExoPlayer
 import androidx.media3.ui.PlayerView
-import com.example.practice.viewmodel.Recipe
+import com.example.practice.R
+import com.example.practice.elements.RecipeShootsCard
+import com.example.practice.elements.UserCommentsCard
+import com.example.practice.viewmodel.Comments
 import com.example.practice.viewmodel.RecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun RecipeTitle(title: String) {
@@ -55,7 +58,6 @@ fun RecipeTitle(title: String) {
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
 
 
     Row(
@@ -86,29 +88,21 @@ fun RecipeTitle(title: String) {
 
 @OptIn(UnstableApi::class)
 @Composable
-fun RecipeTutorial(videoUrl: String) {
+fun RecipeTutorial(videoUrl: String,viewModel: RecipeViewModel) {
     val context = LocalContext.current
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build()
     }
-
-    val viewModel: RecipeViewModel = viewModel()
-    val videoUrlState = remember { mutableStateOf<String?>(null) }
-
-    // Fetch video URL from Firestore
-    LaunchedEffect(Unit) {
-        viewModel.fetchRecipe("Recipe")
-    }
-
-    // Prepare ExoPlayer when videoUrl is fetched
-    LaunchedEffect(videoUrlState.value) {
-        videoUrlState.value?.let { videoUrl ->
+    LaunchedEffect(videoUrl) {
+        videoUrl.let { videoUrl ->
             val mediaSource = MediaItem.fromUri(videoUrl)
             exoPlayer.setMediaItem(mediaSource)
             exoPlayer.prepare()
+            exoPlayer.playWhenReady = false
         }
     }
 
@@ -117,6 +111,10 @@ fun RecipeTutorial(videoUrl: String) {
             exoPlayer.release()
         }
     }
+    // Fetch video URL from Firestore
+    LaunchedEffect(Unit) {
+        viewModel.fetchRecipe("Recipe")
+    }
 
     AndroidView(
         factory = { ctx ->
@@ -124,35 +122,118 @@ fun RecipeTutorial(videoUrl: String) {
                 player = exoPlayer
                 useController = true
 
-                // Enable fast-forward and rewind buttons
                 setShowRewindButton(true)
                 setShowFastForwardButton(true)
             }
         },
-        modifier = Modifier.fillMaxWidth()
-            .height(screenHeight / 3)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .height(screenHeight / 4)
+            .background(color = Color(0xFFEFE7DC))
     )
+
 }
 
+@Composable
+fun RecipeShoots(videoShoots: String) {
 
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+
+    val lazyListState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    Row(
+        modifier = Modifier
+            .padding(12.dp)
+            .fillMaxWidth()
+            .background(color = Color(0xFFEFE7DC)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        LazyRow(
+            state = lazyListState,
+            userScrollEnabled = true,
+            modifier = Modifier
+                .width(screenWidth - 64.dp),
+            contentPadding = PaddingValues(end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(15) { index ->
+                RecipeShootsCard(videoShoots)
+            }
+        }
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+            contentDescription = null,
+            modifier = Modifier
+                .size(32.dp)
+                .clickable(
+                    onClick = {
+                        coroutineScope.launch {
+                            val nextItem = (lazyListState.firstVisibleItemIndex + 1)
+                            lazyListState.animateScrollToItem(nextItem)
+                        }
+                    }
+                )
+        )
+    }
+}
 
 @Composable
-fun TutorialScreen(innerPaddingValues: PaddingValues,recipes: List<Recipe>) {
-    Column(
-        modifier = Modifier
-            .padding(innerPaddingValues)
-    ) {
-        recipes.forEach { recipe ->
-            RecipeTitle(title = recipe.title)
-            RecipeTutorial(videoUrl = recipe.videoUrl)
+fun CommentSection(comment: Comments) {
+
+    var selectedButton by remember { mutableStateOf(false) }
+
+    Column {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .fillMaxWidth()
+                .background(color = Color(0xFFEFE7DC))
+        ) {
+            FixedButton(
+                text = "Comments",
+                isSelected = true,
+                onClick = { selectedButton },
+                modifier = Modifier.wrapContentWidth()
+            )
+        }
+
+        LazyColumn {
+            items(5) {
+                UserCommentsCard(comment.profileUrl,comment.userName,comment.comment)
+            }
         }
     }
 
 }
 
 
-//@Preview
-//@Composable
-//private fun TutorialScreenPreview() {
-//    TutorialScreen()
-//}
+@Composable
+fun TutorialScreen(innerPaddingValues: PaddingValues) {
+
+    val viewModel: RecipeViewModel = viewModel()
+    val recipes by viewModel.recipe.observeAsState(null)
+
+    val videoTitle = recipes?.title ?: "Null"
+    val videoUrl = recipes?.videoUrl ?: "Null"
+    val videoShoots = recipes?.videoShoots ?: "Null"
+    val comment = Comments(
+        profileUrl = R.drawable.profile,
+        userName = "User A",
+        comment = "Hi, how are you?"
+    )
+
+    Column(
+        modifier = Modifier
+            .padding(innerPaddingValues)
+            .fillMaxSize()
+    ) {
+        RecipeTitle(videoTitle)
+        RecipeTutorial(videoUrl,viewModel)
+        RecipeShoots(videoShoots)
+        CommentSection(comment)
+    }
+
+}
