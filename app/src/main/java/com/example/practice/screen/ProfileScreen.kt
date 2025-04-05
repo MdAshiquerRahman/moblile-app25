@@ -1,137 +1,271 @@
 package com.example.practice.screen
 
-
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.example.practice.NavItem
+import androidx.compose.ui.unit.sp
 import com.example.practice.R
-import com.example.practice.pages.ProfilePage
+import com.example.practice.api.allRecipeData
+import com.example.practice.elements.FixedButton
+import com.example.practice.elements.UserProfile
+import com.example.practice.pages.post.RecipePostsCard
 
 @Composable
-fun TopBar() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+fun ProfileScreen(innerPadding: PaddingValues) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .background(Color.White),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.drawer),
-            contentDescription = "Drawer"
-        )
-        Text(text = "Explore")
-        Text(text = "Followers") // New text item
-        Icon(
-            modifier = Modifier.padding(end = 10.dp),
-            painter = painterResource(id = R.drawable.search),
-            contentDescription = "Search",
-            tint = Color.Unspecified
-        )
+
+        UserNamePart()
+        FillTheProfile()
+        Spacer(modifier = Modifier.height(13.dp))
+        PostCollectsHistoryButton()
+        Spacer(modifier = Modifier.height(6.dp))
+        PostCollectsHistory()
     }
+
 }
 
+@Preview
 @Composable
-fun BottomBar(selectedIndex: Int, onItemSelected: (Int) -> Unit) {
+fun UserNamePart() {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
 
-    val navItemList = listOf(
-        NavItem(icon = R.drawable.favorite, badgeCount = 0),
-        NavItem(icon = R.drawable.home, badgeCount = 1),
-        NavItem(icon = R.drawable.post, badgeCount = 2),
-        NavItem(icon = R.drawable.chat, badgeCount = 3),
-        NavItem(icon = R.drawable.profile, badgeCount = 4),
-    )
+    val boxWidthRatio = 110f / screenWidth.value
+    val boxHeightRatio = 110f / screenHeight.value
+    val boxDynamicWidth = screenWidth * boxWidthRatio
+    val boxDynamicHeight = screenHeight * boxHeightRatio
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = Color(0xFFF3ECEC))
-            .padding(8.dp),
+            .padding(10.dp)
+            .background(color = Color(0xFFEFE7DC)),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        UserProfile(boxDynamicHeight,boxDynamicWidth)
+        Column(
+            modifier = Modifier
+                .padding(vertical = 16.dp)
+                .fillMaxWidth(),
+        ) {
+
+            // user name
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "User name",
+                    fontSize = screenRatioFontSize(20f),
+                    fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color.Black
+                )
+                Icon(
+                    painter = painterResource(R.drawable.profile_settings),
+                    contentDescription = null
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            // followers fans collects
+            FollowingFansCollects(following = 24, fans = 1, collects = 12)
+
+        }
+
+    }
+}
+
+
+@Composable
+private fun FollowingFansCollects(following: Int, fans: Int, collects: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Following(following)
+        Fans(fans)
+        Collects(collects)
+    }
+}
+
+@Composable
+fun Following(following: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AllText(following.toString())
+        AllText("Following")
+
+    }
+}
+
+@Composable
+fun Fans(fans: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AllText(fans.toString())
+        AllText("Fans")
+
+    }
+}
+
+@Composable
+fun Collects(collects: Int) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AllText(collects.toString())
+        AllText("Collects")
+    }
+}
+
+@Composable
+fun AllText(text: String) {
+
+    Text(
+        text = text,
+        fontSize = screenRatioFontSize(16f),
+        fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+        fontWeight = FontWeight(400),
+        color = Color.Black
+    )
+}
+
+
+@Preview
+@Composable
+fun FillTheProfile() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp)
+            .background(color = Color(0xFFEFE7DC)),
+        horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.padding(vertical = 20.dp, horizontal = 8.dp),
+            text = "Click here to fill in the profile",
+            style = TextStyle(
+                fontSize = screenRatioFontSize(16f),
+                lineHeight = 20.sp,
+                fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                fontWeight = FontWeight(400),
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PostCollectsHistoryButton() {
+
+    var selectedButton by remember { mutableStateOf("Posts") }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp)
+            .background(color = Color(0xFFEFE7DC)),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        navItemList.forEachIndexed { index, navItem ->
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .background(
-                        color = if (selectedIndex == index) Color(0xFFB1CB90)
-                        else Color(0xFFf9B77C), // Unselected color
-                        shape = CircleShape
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        onItemSelected(index)
-                    },
-                contentAlignment = Alignment.Center
-            ) {
+        FixedButton(
+            text = "Posts",
+            isSelected = selectedButton == "Posts",
+            onClick = { selectedButton = "Posts" },
+            modifier = Modifier.wrapContentWidth()
+        )
+        FixedButton(
+            text = "Collects",
+            isSelected = selectedButton == "Collects",
+            onClick = { selectedButton = "Collects" },
+            modifier = Modifier.wrapContentWidth()
+        )
+        FixedButton(
+            text = "History",
+            isSelected = selectedButton == "History",
+            onClick = { selectedButton = "History" },
+            modifier = Modifier.wrapContentWidth()
+        )
+    }
 
-                Icon(
-                    painter = painterResource(id = navItem.icon),
-                    contentDescription = "Icon",
-                    tint = Color.Unspecified
-                )
+}
 
-            }
+
+@Composable
+fun PostCollectsHistory() {
+    LazyVerticalGrid(
+        modifier = Modifier
+            .padding(bottom = 6.dp),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items(allRecipeData) { item ->
+            RecipePostsCard()
         }
     }
-
-}
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun ProfileScreen() {
-
-    var selectedIndex by remember { mutableIntStateOf(4) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { TopBar() },
-                colors = TopAppBarDefaults.topAppBarColors(Color(0xFFf9B77C))
-            )
-        },
-        bottomBar = { BottomBar(selectedIndex) { index -> selectedIndex = index } }
-
-    ) { innerPadding ->
-        ContentScreen(selectedIndex, innerPadding)
-    }
 }
 
 
 @Composable
-private fun ContentScreen(selectedIndex: Int,innerPadding: PaddingValues) {
-    when (selectedIndex) {
-        4 -> ProfilePage(innerPadding)
-    }
+fun screenRatioFontSize(font: Float): TextUnit {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val ratio = font / screenHeight.value
+    return (screenHeight * ratio).value.sp
 }
-

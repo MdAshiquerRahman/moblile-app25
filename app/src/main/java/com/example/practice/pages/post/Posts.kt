@@ -31,7 +31,7 @@ import com.example.practice.R
 
 @Preview
 @Composable
-fun PostsCard() {
+fun RecipePostsCard() {
     Column(
         modifier = Modifier.wrapContentWidth()
             .background(color = Color.White),
