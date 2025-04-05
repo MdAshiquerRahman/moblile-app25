@@ -130,7 +130,7 @@ fun MyApp() {
 private fun ContentScreen(selectedIndex: Int,innerPadding: PaddingValues) {
 
     val viewModel: RecipeViewModel = viewModel()
-    val recipes by viewModel.recipes.observeAsState(emptyList())
+
 
 
     when (selectedIndex) {
