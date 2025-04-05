@@ -70,4 +70,7 @@ dependencies {
 
     // firebase
     implementation (libs.firebase.firestore.v2450)
+
+    // coil
+    implementation(libs.coil.compose)
 }

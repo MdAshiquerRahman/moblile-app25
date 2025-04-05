@@ -19,7 +19,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,11 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.practice.navitem.NavItem
 import com.example.practice.screen.ProfileScreen
 import com.example.practice.screen.TutorialScreen
-import com.example.practice.viewmodel.RecipeViewModel
 
 @Composable
 fun TopBar() {
@@ -129,12 +126,8 @@ fun MyApp() {
 @Composable
 private fun ContentScreen(selectedIndex: Int,innerPadding: PaddingValues) {
 
-    val viewModel: RecipeViewModel = viewModel()
-
-
-
     when (selectedIndex) {
-        3 -> TutorialScreen(innerPadding,recipes)
+        3 -> TutorialScreen(innerPadding)
         4 -> ProfileScreen(innerPadding)
     }
 }
