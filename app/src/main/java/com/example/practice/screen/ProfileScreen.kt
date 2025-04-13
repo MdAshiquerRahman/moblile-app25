@@ -1,6 +1,7 @@
 package com.example.practice.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -49,6 +51,7 @@ import com.example.practice.viewmodel.AuthViewModel
 
 @Composable
 fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
+    val username = viewModel.getUsername(context = LocalContext.current)
 
     Column(
         modifier = modifier
@@ -57,7 +60,7 @@ fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        UserNamePart("Null","Null")
+        UserNamePart(username.toString(),"Null")
         FillTheProfile()
         Spacer(modifier = Modifier.height(13.dp))
         PostCollectsHistoryButton()
@@ -70,6 +73,8 @@ fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
 
 @Composable
 fun UserNamePart(userName: String, userProfile: String) {
+    val viewModel: AuthViewModel = viewModel()
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,7 +105,14 @@ fun UserNamePart(userName: String, userProfile: String) {
                 )
                 Icon(
                     painter = painterResource(R.drawable.profile_settings),
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable(
+                            onClick = {
+                                // Handle click event
+                                viewModel.logout(context)
+                            }
+                        )
                 )
             }
 

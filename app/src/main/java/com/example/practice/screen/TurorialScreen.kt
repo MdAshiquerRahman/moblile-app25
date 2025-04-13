@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -86,6 +87,7 @@ fun RecipeTitle(title: String) {
 
 }
 
+
 @OptIn(UnstableApi::class)
 @Composable
 fun RecipeTutorial(videoUrl: String,viewModel: RecipeViewModel) {
@@ -112,16 +114,18 @@ fun RecipeTutorial(videoUrl: String,viewModel: RecipeViewModel) {
         }
     }
     // Fetch video URL from Firestore
-    LaunchedEffect(Unit) {
-        viewModel.fetchRecipe("Recipe")
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.fetchRecipe("Recipe")
+//    }
 
     AndroidView(
         factory = { ctx ->
             PlayerView(ctx).apply {
                 player = exoPlayer
                 useController = true
-
+//                showController()
+//                setShowNextButton(true)
+//                setShowPreviousButton(true)
                 setShowRewindButton(true)
                 setShowFastForwardButton(true)
             }
@@ -214,11 +218,11 @@ fun CommentSection(comment: Comments) {
 fun TutorialScreen(modifier: Modifier) {
 
     val viewModel: RecipeViewModel = viewModel()
-    val recipes by viewModel.recipe.observeAsState(null)
+    val recipes by viewModel.recipe.observeAsState()
 
-    val videoTitle = recipes?.title ?: "Null"
-    val videoUrl = recipes?.videoUrl ?: "Null"
-    val videoShoots = recipes?.videoShoots ?: "Null"
+    val videoTitle = recipes?: "Null"
+    val videoUrl = recipes?:"Null"
+    val videoShoots = recipes?: "Null"
     val comment = Comments(
         //profileUrl = R.drawable.profile,
         userName = "User A",
@@ -229,9 +233,9 @@ fun TutorialScreen(modifier: Modifier) {
         modifier = modifier
             .fillMaxSize()
     ) {
-        RecipeTitle(videoTitle)
-        RecipeTutorial(videoUrl,viewModel)
-        RecipeShoots(videoShoots)
+        RecipeTitle(videoTitle.toString())
+        RecipeTutorial(videoUrl.toString(),viewModel)
+        RecipeShoots(videoShoots.toString())
         CommentSection(comment)
     }
 

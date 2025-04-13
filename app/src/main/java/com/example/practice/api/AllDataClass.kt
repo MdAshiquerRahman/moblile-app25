@@ -11,6 +11,19 @@ data class LoginResponse(
     val key: String
 )
 
+class UploadVideos : ArrayList<UploadVideosItem>()
+
+data class UploadVideosItem(
+    val description: String,
+    val id: Int,
+    val title: String,
+    val total_dislikes: Int,
+    val total_likes: Int,
+    val uploaded_at: String,
+    val uploaded_by: Int,
+    val video_file: String
+)
+
 
 data class UserProfile(
     val username: String,
@@ -18,7 +31,7 @@ data class UserProfile(
     val profilePicture: String
 )
 
-data class RegisterRequest(
+data class SignUpRequest(
     val username: String,
     val email: String,
     val password1: String,

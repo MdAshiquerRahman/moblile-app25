@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.cfg.pseudocode.and
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -88,5 +92,13 @@ dependencies {
 
     // Splash Screen
     implementation (libs.androidx.core.splashscreen)
+
+    // Encrypted Shared Preferences
+    implementation (libs.androidx.security.crypto)
+
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
 
 }
