@@ -7,18 +7,12 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.practice.api.AuthRetrofitInstance
 import com.example.practice.api.LoginRequest
 import com.example.practice.api.SignUpRequest
 import com.example.practice.api.UserProfile
-import org.json.JSONException
-import org.json.JSONObject
 import androidx.core.content.edit
 import com.example.practice.repository.SharedPreferencesHelper
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -75,7 +69,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             // Clear the saved token from SharedPreferences
             val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit() { remove("auth_token") }
+            sharedPreferences.edit { remove("auth_token") }
 
             // Update the login state
             _isLoggedIn.value = false
@@ -87,7 +81,7 @@ class AuthViewModel : ViewModel() {
 
     fun saveUsername(context: Context, username: String) {
         val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit() { putString("username", username) }
+        sharedPreferences.edit { putString("username", username) }
     }
 
     fun getUsername(context: Context): String? {

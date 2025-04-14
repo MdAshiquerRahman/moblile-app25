@@ -147,13 +147,25 @@ fun MyApp(
         ) {
 //            composable("favorite") { FavoriteScreen(innerPadding) }
             composable("home") {
-                HomeScreen(modifier.padding(innerPadding))
+                HomeScreen(
+                    navController,
+                    modifier.padding(innerPadding)
+                )
             }
 //            composable("post") {
-//                PostScreen(innerPadding,navController)
+//                PostScreen(
+//                    modifier.padding(innerPadding),
+//                    onUploadClick = TODO()
+//                )
 //            }
-            composable("chat") {
-                TutorialScreen(modifier.padding(innerPadding))
+            composable("tutorial/{title}/{videoUrl}") { backStackEntry ->
+                val title = backStackEntry.arguments?.getString("title")
+                val videoUrl = backStackEntry.arguments?.getString("videoUrl")
+                TutorialScreen(
+                    modifier.padding(innerPadding),
+                    recipeTitle = title ?: "Default Title",
+                    recipeUrl = videoUrl ?: "Default URL"
+                )
             }
             composable("profile") {
                 ProfileScreen(modifier.padding(innerPadding))

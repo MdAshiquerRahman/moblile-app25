@@ -46,6 +46,7 @@ import com.example.practice.elements.FixedButton
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.navigation.NavController
 import com.example.practice.R
 import com.example.practice.elements.RecipeShootsCard
 import com.example.practice.elements.UserCommentsCard
@@ -90,7 +91,7 @@ fun RecipeTitle(title: String) {
 
 @OptIn(UnstableApi::class)
 @Composable
-fun RecipeTutorial(videoUrl: String,viewModel: RecipeViewModel) {
+fun RecipeTutorial(videoUrl: String) {
     val context = LocalContext.current
 
     val configuration = LocalConfiguration.current
@@ -139,50 +140,50 @@ fun RecipeTutorial(videoUrl: String,viewModel: RecipeViewModel) {
 
 }
 
-@Composable
-fun RecipeShoots(videoShoots: String) {
-
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-
-    val lazyListState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    Row(
-        modifier = Modifier
-            .padding(12.dp)
-            .fillMaxWidth()
-            .background(color = Color(0xFFEFE7DC)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        LazyRow(
-            state = lazyListState,
-            userScrollEnabled = true,
-            modifier = Modifier
-                .width(screenWidth - 64.dp),
-            contentPadding = PaddingValues(end = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(15) { index ->
-                RecipeShootsCard(videoShoots)
-            }
-        }
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = null,
-            modifier = Modifier
-                .size(32.dp)
-                .clickable(
-                    onClick = {
-                        coroutineScope.launch {
-                            val nextItem = (lazyListState.firstVisibleItemIndex + 1)
-                            lazyListState.animateScrollToItem(nextItem)
-                        }
-                    }
-                )
-        )
-    }
-}
+//@Composable
+//fun RecipeShoots(videoShoots: String) {
+//
+//    val configuration = LocalConfiguration.current
+//    val screenWidth = configuration.screenWidthDp.dp
+//
+//    val lazyListState = rememberLazyListState()
+//    val coroutineScope = rememberCoroutineScope()
+//    Row(
+//        modifier = Modifier
+//            .padding(12.dp)
+//            .fillMaxWidth()
+//            .background(color = Color(0xFFEFE7DC)),
+//        verticalAlignment = Alignment.CenterVertically,
+//        horizontalArrangement = Arrangement.SpaceBetween
+//    ) {
+//        LazyRow(
+//            state = lazyListState,
+//            userScrollEnabled = true,
+//            modifier = Modifier
+//                .width(screenWidth - 64.dp),
+//            contentPadding = PaddingValues(end = 16.dp),
+//            horizontalArrangement = Arrangement.spacedBy(16.dp),
+//        ) {
+//            items(15) { index ->
+//                RecipeShootsCard(videoShoots)
+//            }
+//        }
+//        Icon(
+//            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+//            contentDescription = null,
+//            modifier = Modifier
+//                .size(32.dp)
+//                .clickable(
+//                    onClick = {
+//                        coroutineScope.launch {
+//                            val nextItem = (lazyListState.firstVisibleItemIndex + 1)
+//                            lazyListState.animateScrollToItem(nextItem)
+//                        }
+//                    }
+//                )
+//        )
+//    }
+//}
 
 @Composable
 fun CommentSection(comment: Comments) {
@@ -215,28 +216,32 @@ fun CommentSection(comment: Comments) {
 
 
 @Composable
-fun TutorialScreen(modifier: Modifier) {
+fun TutorialScreen(
+    modifier: Modifier = Modifier,
+    recipeTitle: String,
+    recipeUrl: String,
+) {
 
-    val viewModel: RecipeViewModel = viewModel()
-    val recipes by viewModel.recipe.observeAsState()
-
-    val videoTitle = recipes?: "Null"
-    val videoUrl = recipes?:"Null"
-    val videoShoots = recipes?: "Null"
-    val comment = Comments(
-        //profileUrl = R.drawable.profile,
-        userName = "User A",
-        comment = "Hi, how are you?"
-    )
+//    val viewModel: RecipeViewModel = viewModel()
+//    val recipes by viewModel.recipe.observeAsState()
+//
+//    val videoTitle = recipes?: "Null"
+//    val videoUrl = recipes?:"Null"
+//    val videoShoots = recipes?: "Null"
+//    val comment = Comments(
+//        //profileUrl = R.drawable.profile,
+//        userName = "User A",
+//        comment = "Hi, how are you?"
+//    )
 
     Column(
         modifier = modifier
             .fillMaxSize()
     ) {
-        RecipeTitle(videoTitle.toString())
-        RecipeTutorial(videoUrl.toString(),viewModel)
-        RecipeShoots(videoShoots.toString())
-        CommentSection(comment)
+        RecipeTitle(recipeTitle)
+        RecipeTutorial(recipeUrl)
+//        RecipeShoots(videoShoots.toString())
+        //CommentSection(comment)
     }
 
 }

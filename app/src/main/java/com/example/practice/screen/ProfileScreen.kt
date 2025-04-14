@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.practice.R
 import com.example.practice.api.allRecipeData
 import com.example.practice.elements.FixedButton
@@ -249,6 +250,7 @@ fun PostCollectsHistoryButton() {
 
 @Composable
 fun PostCollectsHistory() {
+    val navContro = rememberNavController()
     LazyVerticalGrid(
         modifier = Modifier
             .padding(bottom = 6.dp),
@@ -258,7 +260,7 @@ fun PostCollectsHistory() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(allRecipeData) { item ->
-            RecipePostsCard()
+            RecipePostsCard(navContro,"","","",0,"")
         }
     }
 }

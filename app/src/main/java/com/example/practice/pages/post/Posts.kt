@@ -1,7 +1,9 @@
 package com.example.practice.pages.post
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,18 +29,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.practice.R
 
-@Preview
+
 @Composable
-fun RecipePostsCard() {
+fun RecipePostsCard(
+    navController: NavController,
+    title: String,
+    description: String,
+    author: String,
+    totalLikes: Int,
+    videoUrl: String
+) {
     Column(
-        modifier = Modifier.wrapContentWidth()
-            .background(color = Color.White),
+        modifier = Modifier
+            .wrapContentWidth()
+            .background(color = Color.White)
+            .clickable(
+                onClick = {
+                    // Navigate to the tutorial screen
+                    navController.navigate("tutorial" +
+                            "/$title" +
+                            "/${Uri.encode(videoUrl)}"
+                    )
+                }
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth().height(180.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.pizza),
@@ -48,8 +71,9 @@ fun RecipePostsCard() {
         }
         Spacer(modifier = Modifier.height(4.dp))
 
+        // title
         Text(
-            text = "hot and numbing Chicken strips",
+            text = title,
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 28.sp,
@@ -61,13 +85,13 @@ fun RecipePostsCard() {
         )
         Spacer(modifier = Modifier.height(2.dp))
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .background(color = Color(0xFFEFE7DC))
         ) {
+            // description
             Text(
-                text = "This is a very simple gazpacho that is perfect for dinner!!",
-
-                // BODY
+                text = description,
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 20.sp,
@@ -83,8 +107,9 @@ fun RecipePostsCard() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
+            // author
             Text(
-                text = "Gao",
+                text = author,
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
@@ -100,10 +125,11 @@ fun RecipePostsCard() {
                     painter = painterResource(R.drawable.heart_reatc),
                     contentDescription = null
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
+                // total likes
                 Text(
-                    text = "27.2k",
+                    text = "$totalLikes",
                     style = TextStyle(
                         fontSize = 16.sp,
                         lineHeight = 20.sp,
