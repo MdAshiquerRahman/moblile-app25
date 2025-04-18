@@ -188,37 +188,38 @@ fun UserProfile(
     }
 
 
-    @Composable
-    fun FixedButton(
-        text: String,
-        isSelected: Boolean,
-        onClick: () -> Unit,
-        modifier: Modifier
+@Composable
+fun FixedButton(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit, // Changed to a regular lambda
+    modifier: Modifier
+) {
+    Button(
+        modifier = modifier,
+        onClick = { onClick() }, // Keeps the click logic
+        colors = ButtonDefaults.buttonColors(
+            if (isSelected) Color(0xFFAFC988) else Color(0xFFF7B474)
+        ),
+        enabled = true,
     ) {
-        Button(
-            modifier = modifier,
-            onClick = { onClick() },
-            colors = ButtonDefaults.buttonColors(
-                if (isSelected) Color(0xFFAFC988) else Color(0xFFF7B474)
-            ),
-            enabled = true,
-        ) {
-            Text(
-                text = text,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
-                    fontWeight = FontWeight(400),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
+        Text(
+            text = text,
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 20.sp,
+                fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                fontWeight = FontWeight(400),
+                color = Color.Black,
+                textAlign = TextAlign.Center
             )
-        }
+        )
     }
+}
 
 
-    @Composable
+
+@Composable
     fun RecipeShootsCard(
         videoShoots: String
     ) {

@@ -207,6 +207,7 @@ fun CommentSection(recipeId: Int) {
     val errorMessage = viewModel.errorMessage.observeAsState(null)
 
     var selectedButton by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
 
     // Fetch videos after login status is confirmed
@@ -230,9 +231,15 @@ fun CommentSection(recipeId: Int) {
                     isSelected = true,
                     onClick = {
                         selectedButton
+                        viewModel.postComment(
+                            token = "Token ${viewModel.authViewModel.getToken(context)}",
+                            videoId = recipeId,
+                            text = "This is a comment"
+                        )
                     },
                     modifier = Modifier.wrapContentWidth()
                 )
+
             }
             val comments = viewModel.commentList.observeAsState(emptyList())
 
