@@ -34,7 +34,7 @@ import kotlinx.coroutines.delay
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: AuthViewModel = viewModel()
+    viewModel: AuthViewModel
 ) {
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }

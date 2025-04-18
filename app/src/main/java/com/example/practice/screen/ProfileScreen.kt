@@ -1,5 +1,9 @@
 package com.example.practice.screen
 
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,14 +49,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.practice.R
 import com.example.practice.api.allRecipeData
+import com.example.practice.elements.EditProfileDialog
 import com.example.practice.elements.FixedButton
 import com.example.practice.elements.UserProfile
 import com.example.practice.pages.post.RecipePostsCard
 import com.example.practice.viewmodel.AuthViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
-    val username = viewModel.getUsername(context = LocalContext.current)
+fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel,context: Context) {
+    val userName = viewModel.getUsername(context = context).toString()
+    val userPass = viewModel.getPassword(context = context).toString()
+    val userEmail = viewModel.getEmail(context = context).toString()
+
+    val user = viewModel.profile
+    viewModel.login(userName, userEmail, userPass)
 
     Column(
         modifier = modifier
@@ -61,21 +72,23 @@ fun ProfileScreen(modifier: Modifier, viewModel : AuthViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        UserNamePart(username.toString(),"Null")
-        FillTheProfile()
+        Log.e("ProfileScreen", "picture: ${user?.username} ${user?.email}  ${user?.profile_picture}")
+
+        UserNamePart(user?.username?:"Null", user?.email?:"Null",user?.profile_picture?:"Null",viewModel)
         Spacer(modifier = Modifier.height(13.dp))
         PostCollectsHistoryButton()
         Spacer(modifier = Modifier.height(6.dp))
-        PostCollectsHistory()
+//        PostCollectsHistory()
     }
 
 }
 
 
 @Composable
-fun UserNamePart(userName: String, userProfile: String) {
-    val viewModel: AuthViewModel = viewModel()
+fun UserNamePart(userName: String, userEmail: String, userProfile: String,viewModel: AuthViewModel) {
     val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,13 +110,22 @@ fun UserNamePart(userName: String, userProfile: String) {
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = userName,
-                    fontSize = screenRatioFontSize(20f),
-                    fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
-                    fontWeight = FontWeight(400),
-                    color = Color.Black
-                )
+                Column {
+                    Text(
+                        text = userName,
+                        fontSize = screenRatioFontSize(20f),
+                        fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color.Black
+                    )
+                    Text(
+                        text = userEmail,
+                        fontSize = screenRatioFontSize(12f),
+                        fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color.Black
+                    )
+                }
                 Icon(
                     painter = painterResource(R.drawable.profile_settings),
                     contentDescription = null,
@@ -111,15 +133,19 @@ fun UserNamePart(userName: String, userProfile: String) {
                         .clickable(
                             onClick = {
                                 // Handle click event
-                                viewModel.logout(context)
+                                showDialog = true
                             }
                         )
                 )
             }
 
+            EditProfileDialog(
+                showDialog = showDialog,
+                onDismiss = { showDialog = false },
+                viewModel = viewModel
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
-            // followers fans collects
-            FollowingFansCollects(following = 24, fans = 1, collects = 12)
 
         }
 
@@ -248,22 +274,22 @@ fun PostCollectsHistoryButton() {
 }
 
 
-@Composable
-fun PostCollectsHistory() {
-    val navContro = rememberNavController()
-    LazyVerticalGrid(
-        modifier = Modifier
-            .padding(bottom = 6.dp),
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        items(allRecipeData) { item ->
-            RecipePostsCard(navContro,"","","",0,"")
-        }
-    }
-}
+//@Composable
+//fun PostCollectsHistory() {
+//    val navControl = rememberNavController()
+//    LazyVerticalGrid(
+//        modifier = Modifier
+//            .padding(bottom = 6.dp),
+//        columns = GridCells.Fixed(2),
+//        contentPadding = PaddingValues(horizontal = 16.dp),
+//        verticalArrangement = Arrangement.spacedBy(16.dp),
+//        horizontalArrangement = Arrangement.spacedBy(16.dp),
+//    ) {
+//        items(allRecipeData) { item ->
+//            RecipePostsCard(navControl,"","","",0,"","")
+//        }
+//    }
+//}
 
 
 @Composable

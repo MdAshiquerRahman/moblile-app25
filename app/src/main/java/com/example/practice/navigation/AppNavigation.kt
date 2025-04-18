@@ -1,5 +1,7 @@
 package com.example.practice.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -7,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,11 +23,12 @@ import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.VideoViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = viewModel()) {
-
+    ) {
+    val viewModel: AuthViewModel = viewModel()
     val navController = rememberNavController()
     val context = LocalContext.current
 
@@ -44,13 +48,13 @@ fun AppNavigation(
             AuthScreen(modifier,navController)
         }
         composable("signup") {
-            SignUpScreen(modifier,navController)
+            SignUpScreen(modifier,navController,viewModel)
         }
         composable("login") {
-            LoginScreen(modifier,navController)
+            LoginScreen(modifier,navController,viewModel,context)
         }
         composable("myapp") {
-            MyApp(modifier)
+            MyApp(modifier,viewModel,context)
         }
     }
 

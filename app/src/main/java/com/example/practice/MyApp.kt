@@ -1,6 +1,10 @@
 package com.example.practice
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +43,7 @@ import com.example.practice.navitem.BottomNavigationItem
 import com.example.practice.screen.HomeScreen
 import com.example.practice.screen.ProfileScreen
 import com.example.practice.screen.TutorialScreen
+import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.VideoViewModel
 import dagger.hilt.android.HiltAndroidApp
 
@@ -68,11 +73,14 @@ fun TopBar() {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(
     modifier: Modifier = Modifier,
+    viewModel: AuthViewModel,
+    context: Context
 ) {
     val navItemList = listOf(
         BottomNavigationItem(title = "home", icon = R.drawable.home),
@@ -149,7 +157,7 @@ fun MyApp(
             composable("home") {
                 HomeScreen(
                     navController,
-                    modifier.padding(innerPadding)
+                    modifier.padding(innerPadding),
                 )
             }
 //            composable("post") {
@@ -158,17 +166,21 @@ fun MyApp(
 //                    onUploadClick = TODO()
 //                )
 //            }
-            composable("tutorial/{title}/{videoUrl}") { backStackEntry ->
+            composable("tutorial/{title}/{videoUrl}/{videoId}") { backStackEntry ->
                 val title = backStackEntry.arguments?.getString("title")
                 val videoUrl = backStackEntry.arguments?.getString("videoUrl")
+                val videoId = backStackEntry.arguments?.getString("videoId")
+                Log.e("VideoId", videoId.toString())
                 TutorialScreen(
+                    navController,
                     modifier.padding(innerPadding),
                     recipeTitle = title ?: "Default Title",
-                    recipeUrl = videoUrl ?: "Default URL"
+                    recipeUrl = videoUrl ?: "Default URL",
+                    recipeId = videoId?.toIntOrNull() ?: 0,
                 )
             }
             composable("profile") {
-                ProfileScreen(modifier.padding(innerPadding))
+                ProfileScreen(modifier.padding(innerPadding),viewModel,context)
             }
         }
     }

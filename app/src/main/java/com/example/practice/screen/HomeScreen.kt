@@ -86,6 +86,8 @@ fun VideoTutorials(navController: NavController,modifier: Modifier = Modifier, v
                     author = video.uploaded_by.toString(),
                     totalLikes = video.total_likes,
                     videoUrl = video.video_file,
+                    videoId = video.id,
+                    thumbnailUrl = video.thamnail,
                 )
             }
         }
