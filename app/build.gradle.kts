@@ -1,8 +1,12 @@
+import org.jetbrains.kotlin.cfg.pseudocode.and
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -51,6 +55,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,17 +68,37 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // exo player
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.exoplayer.dash)
-    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.exoplayer.v161)
+    implementation(libs.androidx.media3.exoplayer.dash.v161)
+    implementation(libs.androidx.media3.ui.v161)
 
     // viewModel
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation (libs.androidx.runtime.livedata)
 
     // firebase
-    implementation (libs.firebase.firestore.v2450)
+    implementation (libs.firebase.firestore)
 
     // coil
     implementation(libs.coil.compose)
+
+    // Retrofit
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.logging.interceptor)
+
+    // Navigation
+    implementation (libs.androidx.navigation.compose)
+
+    // Splash Screen
+    implementation (libs.androidx.core.splashscreen)
+
+    // Encrypted Shared Preferences
+    implementation (libs.androidx.security.crypto)
+
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
+
 }

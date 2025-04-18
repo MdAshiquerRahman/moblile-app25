@@ -1,9 +1,9 @@
 package com.example.practice.navitem
 
 
-data class NavItem(
-    val icon: Int,
-    val badgeCount: Int? = null,
+data class BottomNavigationItem(
+    val title: String,
+    val icon: Int
 )
 
 data class TopBarItem(
