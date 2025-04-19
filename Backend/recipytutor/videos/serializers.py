@@ -8,11 +8,12 @@ class VideoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ['id', 'title', 'description', 'video_file', 'uploaded_by', 'uploaded_at', 'total_likes', 'total_dislikes', 'thamnail']
-
+        fields = ['id', 'title', 'description', 'video_file', 
+                'uploaded_by', 'uploaded_at', 'total_likes', 
+                'total_dislikes', 'thamnail']
 
 class VideoCommentSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(source='user.username', read_only=True)  # This line does the trick
+    user = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = VideoComment
