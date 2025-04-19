@@ -1,8 +1,15 @@
 package com.example.practice.api
 
-import com.example.practice.viewmodel.CommentItem
-import com.example.practice.viewmodel.CommentPostRequest
-import com.example.practice.viewmodel.Comments
+
+import com.example.practice.api.dataclass.comment.CommentRequest
+import com.example.practice.api.dataclass.comment.CommentResponse
+import com.example.practice.api.dataclass.comment.Comments
+import com.example.practice.api.dataclass.login.LoginRequest
+import com.example.practice.api.dataclass.login.LoginResponse
+import com.example.practice.api.dataclass.profile.ProfileResponse
+import com.example.practice.api.dataclass.signup.SignUpRequest
+import com.example.practice.api.dataclass.video.UploadVideos
+import com.example.practice.api.dataclass.video.UploadVideosItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -16,29 +23,38 @@ import retrofit2.http.Part
 
 interface AuthApiService {
 
-//    @GET("api/profile/update/")
-//    suspend fun getProfile(
-//        @Header("Authorization") token: String
-//    ): Response<ProfileResponse>
-
-
     @POST("auth/registration/")
     suspend fun registerUser(@Body request: SignUpRequest): Response<Unit>
 
     @POST("auth/login/")
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
+
+
     @GET("api/videos/upload_videos/")
     suspend fun getVideos(): Response<UploadVideos>
+
+    @Multipart
+    @POST("api/videos/upload_videos/")
+    suspend fun uploadVideo(
+        @Header("Authorization") token: String,
+        @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part video: MultipartBody.Part?,
+        @Part thumbnail: MultipartBody.Part?
+    ): Response<UploadVideosItem>
+
+
 
     @GET("api/videos/video-comments/")
     suspend fun getComments(): Response<Comments>
 
-    @POST("api/videos/video-comments/")
+    @POST("/api/videos/video-comments/")
     suspend fun postComment(
         @Header("Authorization") token: String,
-        @Body comment: CommentPostRequest
-    ): Response<CommentItem>
+        @Body comment: CommentRequest
+    ): Response<CommentResponse>
+
 
 
     @GET("api/profile/update/")
@@ -54,6 +70,9 @@ interface AuthApiService {
         @Part profile_picture: MultipartBody.Part? = null,
         @Part("UserId") userId: RequestBody? = null
     ): ProfileResponse
+
+    @POST("auth/logout/")
+    suspend fun logout(@Header("Authorization") token: String): Response<Unit>
 
 
 }

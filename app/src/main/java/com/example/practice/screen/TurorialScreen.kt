@@ -7,6 +7,7 @@ import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,22 +16,30 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,7 +49,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,6 +68,7 @@ import com.example.practice.elements.EditProfileDialog
 import com.example.practice.elements.UserCommentsCard
 import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.CommentViewModel
+import com.example.practice.viewmodel.VideoViewModel
 import org.w3c.dom.Comment
 
 @Composable
@@ -72,18 +85,18 @@ fun RecipeTitle(navController: NavController,title: String) {
             .fillMaxWidth()
             .background(color = Color(0xFFEFE7DC)),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        navController.popBackStack()
-                    }
-                )
-        )
-        Spacer(modifier = Modifier.padding(start = screenWidth / 4))
+//        Icon(
+//            imageVector = Icons.Default.ArrowBack,
+//            contentDescription = null,
+//            modifier = Modifier
+//                .clickable(
+//                    onClick = {
+//                        navController.popBackStack()
+//                    }
+//                )
+//        )
         FixedButton(
             text = title,
             isSelected = true,
@@ -100,6 +113,7 @@ fun RecipeTitle(navController: NavController,title: String) {
 @Composable
 fun RecipeTutorial(videoUrl: String) {
     val context = LocalContext.current
+
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     var isFullScreen by remember { mutableStateOf(false) }
@@ -199,16 +213,19 @@ fun RecipeTutorial(videoUrl: String) {
 
 @OptIn(UnstableApi::class)
 @Composable
-fun CommentSection(recipeId: Int) {
+fun CommentSection(totalLikes: Int, totalDislikes: Int, recipeId: Int) {
 
 
     val viewModel : CommentViewModel = viewModel()
+
     val isLoading = viewModel.isLoading.observeAsState(false)
     val errorMessage = viewModel.errorMessage.observeAsState(null)
 
     var selectedButton by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val token = viewModel.authViewModel.getToken(context)
 
     // Fetch videos after login status is confirmed
     LaunchedEffect(Unit) {
@@ -224,21 +241,49 @@ fun CommentSection(recipeId: Int) {
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .fillMaxWidth()
-                    .background(color = Color(0xFFEFE7DC))
+                    .background(color = Color(0xFFEFE7DC)),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 FixedButton(
                     text = "Comments",
                     isSelected = true,
                     onClick = {
                         selectedButton
-                        viewModel.postComment(
-                            token = "Token ${viewModel.authViewModel.getToken(context)}",
-                            videoId = recipeId,
-                            text = "This is a comment"
-                        )
+                        showDialog = true
                     },
                     modifier = Modifier.wrapContentWidth()
                 )
+                Spacer(modifier = Modifier.width(10.dp))
+                Icon(
+                    painter = painterResource(R.drawable.heart_reatc),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable(
+                            onClick = {
+
+                            }
+                        )
+                )
+                Spacer(modifier = Modifier.width(40.dp))
+                LikeDislikeButtons(
+                    initialLikes = totalLikes,
+                    initialDislikes = totalDislikes
+                )
+                if (showDialog) {
+                    CommentDialog(
+                        onDismissRequest = { showDialog = false },
+                        onConfirmRequest = { comment ->
+                            showDialog = false
+                            // Perform the postComment action here
+                            viewModel.postComment(
+                                token = token.toString(),
+                                videoId = recipeId,
+                                text = comment // Use the input from the dialog
+                            )
+                        }
+                    )
+                }
 
             }
             val comments = viewModel.commentList.observeAsState(emptyList())
@@ -249,16 +294,192 @@ fun CommentSection(recipeId: Int) {
                         UserCommentsCard(
                             userName = comment.user,
                             comment = comment.text,
-                            profileUrl = R.drawable.profile.toString()
+                            profileUrl = ""
                         )
                     }
                 }
             }
         }
     }
-
-
 }
+
+@Composable
+fun LikeDislikeButtons(
+    initialLikes: Int,
+    initialDislikes: Int
+) {
+    // States to track likes, dislikes, and current user selection
+    var totalLikes by remember { mutableIntStateOf(initialLikes) }
+    var totalDislikes by remember { mutableIntStateOf(initialDislikes) }
+    var isLiked by remember { mutableStateOf(false) }
+    var isDisliked by remember { mutableStateOf(false) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        // Like Button
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_like),
+                contentDescription = "Like Icon",
+                tint = if (isLiked) Color.Blue else Color.Gray, // Dynamic color based on state
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(
+                        onClick = {
+                            if (!isLiked) { // Increment likes and reset dislikes
+                                totalLikes++
+                                if (isDisliked) {
+                                    totalDislikes-- // Remove dislike if switching to like
+                                    isDisliked = false
+                                }
+                                isLiked = true
+                            } else { // Decrement likes if unliked
+                                totalLikes--
+                                isLiked = false
+                            }
+                        }
+                    )
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = totalLikes.toString(),
+                style = TextStyle(fontSize = 14.sp, color = Color.Black)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Dislike Button
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_dislike),
+                contentDescription = "Dislike Icon",
+                tint = if (isDisliked) Color.Red else Color.Gray, // Dynamic color based on state
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(
+                        onClick = {
+                            if (!isDisliked) { // Increment dislikes and reset likes
+                                totalDislikes++
+                                if (isLiked) {
+                                    totalLikes-- // Remove like if switching to dislike
+                                    isLiked = false
+                                }
+                                isDisliked = true
+                            } else { // Decrement dislikes if undisliked
+                                totalDislikes--
+                                isDisliked = false
+                            }
+                        }
+                    )
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = totalDislikes.toString(),
+                style = TextStyle(fontSize = 14.sp, color = Color.Black)
+            )
+        }
+    }
+}
+
+
+
+
+
+
+@Composable
+fun RecipeDescription(author: String, description: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .background(
+                color = Color(0xFFEFD1BF)
+            )
+    ) {
+        DescriptionTextWithDialog(author,description)
+    }
+}
+
+@Composable
+fun DescriptionTextWithDialog(author: String, description: String) {
+    var isDialogOpen by remember { mutableStateOf(false) } // State for dialog visibility
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        // Text content
+        Text(
+            text = " Author: $author \n Description: $description",
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis, // Ellipsis for overflow
+            modifier = Modifier.clickable { isDialogOpen = true } // Open dialog on click
+        )
+    }
+
+    // Dialog to show full description
+    if (isDialogOpen) {
+        AlertDialog(
+            onDismissRequest = { isDialogOpen = false },
+            title = { Text("Full Description") },
+            text = {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        Text(text = description) // Show full description in scrollable view
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { isDialogOpen = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+}
+
+
+
+@Composable
+fun CommentDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: (String) -> Unit
+) {
+    var commentText by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {
+            Text(text = "Add Comment")
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = commentText,
+                    onValueChange = { commentText = it },
+                    label = { Text(text = "Comment") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirmRequest(commentText) }) {
+                Text(text = "Submit")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismissRequest) {
+                Text(text = "Cancel")
+            }
+        }
+    )
+}
+
 
 
 @OptIn(UnstableApi::class)
@@ -267,32 +488,21 @@ fun TutorialScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     recipeTitle: String,
+    recipeDescription: String,
+    author: String,
+    totalLikes: Int,
+    totalDislikes: Int,
     recipeUrl: String,
-    recipeId: Int,
+    recipeId: Int
 ) {
-    Log.e("VideoId", recipeId.toString())
-
-//    val viewModel: RecipeViewModel = viewModel()
-//    val recipes by viewModel.recipe.observeAsState()
-//
-//    val videoTitle = recipes?: "Null"
-//    val videoUrl = recipes?:"Null"
-//    val videoShoots = recipes?: "Null"
-//    val comment = Comment(
-//        //profileUrl = R.drawable.profile,
-//        userName = "User A",
-//        comment = "Hi, how are you?"
-//    )
-
-
     Column(
         modifier = modifier
             .fillMaxSize()
     ) {
         RecipeTitle(navController,recipeTitle)
         RecipeTutorial(recipeUrl)
-//        RecipeShoots(videoShoots.toString())
-        CommentSection(recipeId)
+        RecipeDescription(author,recipeDescription)
+        CommentSection(totalLikes,totalDislikes,recipeId)
     }
 
 }

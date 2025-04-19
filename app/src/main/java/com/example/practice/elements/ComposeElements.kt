@@ -95,21 +95,35 @@ fun UserProfile(
             .width(boxDynamicWidth)
             .background(color = Color(0xFFAFC888), shape = CircleShape)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(profileUrl)
-                .crossfade(true)
-                .listener(
-                    onSuccess = { _, _ -> isLoading = false },
-                    onError = { _, _ -> isLoading = false }
-                )
-                .build(),
-            contentDescription = "Profile_Picture",
-            contentScale = ContentScale.Crop,
-        )
-
-        if (isLoading) {
-            CircularProgressIndicator(color = Color.Cyan)
+        if(profileUrl.isEmpty()){
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(R.drawable.profile)
+                    .crossfade(true)
+                    .listener(
+                        onSuccess = { _, _ -> isLoading = false },
+                        onError = { _, _ -> isLoading = false }
+                    )
+                    .build(),
+                contentDescription = "Profile_Picture",
+                contentScale = ContentScale.Crop,
+            )
+        }else {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(profileUrl)
+                    .crossfade(true)
+                    .listener(
+                        onSuccess = { _, _ -> isLoading = false },
+                        onError = { _, _ -> isLoading = false }
+                    )
+                    .build(),
+                contentDescription = "Profile_Picture",
+                contentScale = ContentScale.Crop,
+            )
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.Cyan)
+            }
         }
     }
 }

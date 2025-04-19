@@ -41,6 +41,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.practice.navitem.BottomNavigationItem
 import com.example.practice.screen.HomeScreen
+import com.example.practice.screen.PostScreen
 import com.example.practice.screen.ProfileScreen
 import com.example.practice.screen.TutorialScreen
 import com.example.practice.viewmodel.AuthViewModel
@@ -160,14 +161,18 @@ fun MyApp(
                     modifier.padding(innerPadding),
                 )
             }
-//            composable("post") {
-//                PostScreen(
-//                    modifier.padding(innerPadding),
-//                    onUploadClick = TODO()
-//                )
-//            }
-            composable("tutorial/{title}/{videoUrl}/{videoId}") { backStackEntry ->
+            composable("post") {
+                PostScreen(
+                    modifier.padding(innerPadding),
+                    navController = navController,
+                )
+            }
+            composable("tutorial/{title}/{description}/{author}/{totalLikes}/{totalDislikes}/{videoUrl}/{videoId}") { backStackEntry ->
                 val title = backStackEntry.arguments?.getString("title")
+                val description = backStackEntry.arguments?.getString("description")
+                val author = backStackEntry.arguments?.getString("author")
+                val totalLikes = backStackEntry.arguments?.getString("totalLikes")?.toInt()
+                val totalDislikes = backStackEntry.arguments?.getString("totalDislikes")?.toInt()
                 val videoUrl = backStackEntry.arguments?.getString("videoUrl")
                 val videoId = backStackEntry.arguments?.getString("videoId")
                 Log.e("VideoId", videoId.toString())
@@ -175,12 +180,16 @@ fun MyApp(
                     navController,
                     modifier.padding(innerPadding),
                     recipeTitle = title ?: "Default Title",
+                    recipeDescription = description ?: "Default Description",
+                    author = author ?: "Default Author",
+                    totalLikes = totalLikes ?: 0,
+                    totalDislikes = totalDislikes ?: 0,
                     recipeUrl = videoUrl ?: "Default URL",
                     recipeId = videoId?.toIntOrNull() ?: 0,
                 )
             }
             composable("profile") {
-                ProfileScreen(modifier.padding(innerPadding),viewModel,context)
+                ProfileScreen(modifier.padding(innerPadding),viewModel,context,navController)
             }
         }
     }

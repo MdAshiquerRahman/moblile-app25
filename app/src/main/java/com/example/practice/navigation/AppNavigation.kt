@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +22,7 @@ import com.example.practice.screen.auth.LoginScreen
 import com.example.practice.screen.auth.SignUpScreen
 import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.VideoViewModel
+import kotlinx.coroutines.delay
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -33,6 +35,13 @@ fun AppNavigation(
     val context = LocalContext.current
 
     val isLoggedIn = remember { mutableStateOf(false) }
+    val isReady = remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(Unit) {
+        delay(1000)
+        isReady.value = true
+    }
 
     // Call checkLoginStatus to update the login state reactively
     LaunchedEffect(context) {
@@ -42,10 +51,13 @@ fun AppNavigation(
 
     val startDestination = if (isLoggedIn.value) "myapp" else "auth"
 
-
     NavHost(navController = navController, startDestination = startDestination) {
         composable("auth") {
-            AuthScreen(modifier,navController)
+            AuthScreen(
+                modifier = modifier,
+                navController = navController,
+                isReadyToRender = isReady.value
+            )
         }
         composable("signup") {
             SignUpScreen(modifier,navController,viewModel)
