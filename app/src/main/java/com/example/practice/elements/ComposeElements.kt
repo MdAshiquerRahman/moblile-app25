@@ -187,6 +187,8 @@ fun UserProfile(
                             profile_picture = imageUri,
                             userId = null
                         )
+                        viewModel.saveUsername(context,username)
+                        viewModel.saveEmail(context,email)
                         onDismiss()
                     }) {
                         Text("Save")

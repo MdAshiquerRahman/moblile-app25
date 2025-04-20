@@ -3,6 +3,7 @@ package com.example.practice.screen
 
 
 import android.content.Context
+import android.widget.Toast
 import androidx.annotation.OptIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.Log
@@ -213,7 +215,16 @@ fun RecipeTutorial(videoUrl: String) {
 
 @OptIn(UnstableApi::class)
 @Composable
-fun CommentSection(totalLikes: Int, totalDislikes: Int, recipeId: Int) {
+fun CommentSection(
+    videoViewModel: VideoViewModel,
+    title: String,
+    description: String,
+    video_file: String,
+    thamnail: String,
+    totalLikes: Int,
+    totalDislikes: Int,
+    recipeId: Int
+) {
 
 
     val viewModel : CommentViewModel = viewModel()
@@ -267,6 +278,12 @@ fun CommentSection(totalLikes: Int, totalDislikes: Int, recipeId: Int) {
                 )
                 Spacer(modifier = Modifier.width(40.dp))
                 LikeDislikeButtons(
+                    videoViewModel = videoViewModel,
+                    videoId = recipeId,
+                    title = title,
+                    description = description,
+                    video_file = video_file,
+                    thamnail = thamnail,
                     initialLikes = totalLikes,
                     initialDislikes = totalDislikes
                 )
@@ -305,6 +322,12 @@ fun CommentSection(totalLikes: Int, totalDislikes: Int, recipeId: Int) {
 
 @Composable
 fun LikeDislikeButtons(
+    videoViewModel: VideoViewModel,
+    title: String,
+    description: String,
+    video_file: String,
+    thamnail: String,
+    videoId: Int,
     initialLikes: Int,
     initialDislikes: Int
 ) {
@@ -313,6 +336,8 @@ fun LikeDislikeButtons(
     var totalDislikes by remember { mutableIntStateOf(initialDislikes) }
     var isLiked by remember { mutableStateOf(false) }
     var isDisliked by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val token = videoViewModel.authViewModel.getToken(context)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -331,17 +356,26 @@ fun LikeDislikeButtons(
                     .size(24.dp)
                     .clickable(
                         onClick = {
-                            if (!isLiked) { // Increment likes and reset dislikes
-                                totalLikes++
-                                if (isDisliked) {
-                                    totalDislikes-- // Remove dislike if switching to like
-                                    isDisliked = false
+//                            if (!isLiked) {
+//                                totalLikes++
+//                                if (isDisliked) {
+//                                    totalDislikes--
+//                                    isDisliked = false
+//                                }
+//                                isLiked = true
+//                            } else {
+//                                totalLikes--
+//                                isLiked = false
+//                            }
+                            videoViewModel.updateLike(
+                                videoId = videoId,
+                                token = token.toString(),
+                                onSuccess = {
+                                    // Update UI or refresh video list
+                                    Toast.makeText(context, "Liked successfully!", Toast.LENGTH_SHORT).show()
                                 }
-                                isLiked = true
-                            } else { // Decrement likes if unliked
-                                totalLikes--
-                                isLiked = false
-                            }
+                            )
+
                         }
                     )
             )
@@ -366,17 +400,26 @@ fun LikeDislikeButtons(
                     .size(24.dp)
                     .clickable(
                         onClick = {
-                            if (!isDisliked) { // Increment dislikes and reset likes
-                                totalDislikes++
-                                if (isLiked) {
-                                    totalLikes-- // Remove like if switching to dislike
-                                    isLiked = false
+//                            if (!isDisliked) {
+//                                totalDislikes++
+//                                if (isLiked) {
+//                                    totalLikes--
+//                                    isLiked = false
+//                                }
+//                                isDisliked = true
+//                            } else {
+//                                totalDislikes--
+//                                isDisliked = false
+//                            }
+
+                            videoViewModel.updateDislike(
+                                videoId = videoId,
+                                token = token.toString(),
+                                onSuccess = {
+                                    // Update UI or refresh video list
+                                    Toast.makeText(context, "Disliked successfully!", Toast.LENGTH_SHORT).show()
                                 }
-                                isDisliked = true
-                            } else { // Decrement dislikes if undisliked
-                                totalDislikes--
-                                isDisliked = false
-                            }
+                            )
                         }
                     )
             )
@@ -487,12 +530,14 @@ fun CommentDialog(
 fun TutorialScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
+    videoViewModel: VideoViewModel,
     recipeTitle: String,
     recipeDescription: String,
     author: String,
     totalLikes: Int,
     totalDislikes: Int,
     recipeUrl: String,
+    recipeThumbnail: String,
     recipeId: Int
 ) {
     Column(
@@ -502,7 +547,16 @@ fun TutorialScreen(
         RecipeTitle(navController,recipeTitle)
         RecipeTutorial(recipeUrl)
         RecipeDescription(author,recipeDescription)
-        CommentSection(totalLikes,totalDislikes,recipeId)
+        CommentSection(
+            videoViewModel,
+            recipeTitle,
+            recipeDescription,
+            recipeUrl,
+            recipeThumbnail,
+            totalLikes,
+            totalDislikes,
+            recipeId
+        )
     }
 
 }

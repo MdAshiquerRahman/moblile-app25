@@ -48,6 +48,9 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         videoViewModel.fetchVideos()
     }
+    LaunchedEffect(Unit) {
+        videoViewModel.fetchVideos()
+    }
     if (isLoading.value) {
         // Center the CircularProgressIndicator on the screen
         Box(

@@ -1,6 +1,7 @@
 package com.example.practice.screen
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -63,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.practice.MainActivity
 import com.example.practice.R
 import com.example.practice.TopBar
 import com.example.practice.api.allRecipeData
@@ -104,7 +106,9 @@ fun ProfileScreen(
             DrawerContent(
                 onLogoutClick = {
                     viewModel.logout(context)
-                    navController.navigate("home") // Navigate to the login screen
+                    val intent = Intent(context, MainActivity::class.java)
+                    intent.putExtra("startDestination", "auth") // Pass the desired route
+                    context.startActivity(intent)
                 }
             )
         }

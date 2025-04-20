@@ -60,7 +60,7 @@ fun RecipePostsCard(
             .clickable(
                 onClick = {
                     // Navigate to the tutorial screen
-                    navController.navigate("tutorial/$title/$description/$author/$totalLikes/$totalDislikes/${Uri.encode(videoUrl)}/$videoId")
+                    navController.navigate("tutorial/$title/$description/$author/$totalLikes/$totalDislikes/${Uri.encode(videoUrl)}/${Uri.encode(thumbnailUrl)}/$videoId")
                 }
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -76,7 +76,8 @@ fun RecipePostsCard(
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile_Picture",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
         }
         Spacer(modifier = Modifier.height(4.dp))

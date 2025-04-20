@@ -98,7 +98,7 @@ class VideoViewModel : ViewModel() {
         }
     }
 
-    private fun handleApiResponse(response: Response<UploadVideosItem>, onSuccess: () -> Unit) {
+    private fun <T> handleApiResponse(response: Response<T>, onSuccess: () -> Unit) {
         if (response.isSuccessful) {
             onSuccess()
         } else {
@@ -106,6 +106,25 @@ class VideoViewModel : ViewModel() {
             _errorMessage.value = errorBody ?: "Unexpected error occurred"
         }
     }
+
+
+//    private fun handleApiResponse(response: Response<UploadVideosItem>, onSuccess: () -> Unit) {
+//        if (response.isSuccessful) {
+//            onSuccess()
+//        } else {
+//            val errorBody = response.errorBody()?.string()
+//            _errorMessage.value = errorBody ?: "Unexpected error occurred"
+//        }
+//    }
+//
+//    private fun handleApiResponseUnit(response: Response<Unit>, onSuccess: () -> Unit) {
+//        if (response.isSuccessful) {
+//            onSuccess()
+//        } else {
+//            val errorBody = response.errorBody()?.string()
+//            _errorMessage.value = errorBody ?: "Unexpected error occurred"
+//        }
+//    }
 
 
     // Fetch videos directly from the API
@@ -128,6 +147,51 @@ class VideoViewModel : ViewModel() {
             }
         }
     }
+
+    fun updateLike(videoId: Int, token: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = AuthRetrofitInstance.api.updateLike(
+                    token = "Token $token",
+                    videoId = videoId
+                )
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    _errorMessage.value = "Error: ${response.code()} - ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "An error occurred: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun updateDislike(videoId: Int, token: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = AuthRetrofitInstance.api.updateDislike(
+                    token = "Token $token",
+                    videoId = videoId
+                )
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    _errorMessage.value = "Error: ${response.code()} - ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "An error occurred: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+
+
 }
 
 
