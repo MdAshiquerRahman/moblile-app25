@@ -47,25 +47,25 @@ interface AuthApiService {
         @Part thumbnail: MultipartBody.Part?
     ): Response<UploadVideosItem>
 
-    @Multipart
-    @POST("api/videos/upload-videos/")
-    suspend fun uploadVideoLikeDislike(
-        @Header("Authorization") token: String,
-        @Part("title") title: RequestBody,
-        @Part("description") description: RequestBody,
-        @Part video: MultipartBody.Part?,
-        @Part thumbnail: MultipartBody.Part?,
-        @Part("total_likes") totalLikes: RequestBody,
-        @Part("total_dislikes") totalDislikes: RequestBody
-    ): Response<UploadVideosItem>
 
+    @POST("api/videos/{video_id}/like/")
+    suspend fun likeVideo(
+        @Header("Authorization") token: String,
+        @Path("video_id") videoId: Int
+    ): Response<Unit>
+
+    @POST("api/videos/{video_id}/dislike/")
+    suspend fun dislikeVideo(
+        @Header("Authorization") token: String,
+        @Path("video_id") videoId: Int
+    ): Response<Unit>
 
 
 
     @GET("api/videos/video-comments/")
     suspend fun getComments(): Response<Comments>
 
-    @POST("/api/videos/video-comments/")
+    @POST("api/videos/video-comments/")
     suspend fun postComment(
         @Header("Authorization") token: String,
         @Body comment: CommentRequest
@@ -91,17 +91,7 @@ interface AuthApiService {
     @POST("auth/logout/")
     suspend fun logout(@Header("Authorization") token: String): Response<Unit>
 
-    @POST("videos/{video_id}/like/")
-    suspend fun updateLike(
-        @Header("Authorization") token: String,
-        @Path("video_id") videoId: Int
-    ): Response<Unit>
 
-    @POST("videos/{video_id}/dislike/")
-    suspend fun updateDislike(
-        @Header("Authorization") token: String,
-        @Path("video_id") videoId: Int
-    ): Response<Unit>
 
 
 
