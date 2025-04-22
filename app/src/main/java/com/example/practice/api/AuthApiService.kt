@@ -88,6 +88,10 @@ interface AuthApiService {
     ): ProfileResponse
 
 
+
+
+
+
     @POST("auth/logout/")
     suspend fun logout(@Header("Authorization") token: String): Response<Unit>
 

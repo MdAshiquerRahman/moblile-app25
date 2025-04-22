@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AuthRetrofitInstance {
 
-    private const val BASE_URL = "http://10.150.14.12:8000/"
+    private const val BASE_URL = "http://192.168.31.152:8000/"
 
     // Logging interceptor for debugging requests/responses
     private val logging = HttpLoggingInterceptor().apply {
