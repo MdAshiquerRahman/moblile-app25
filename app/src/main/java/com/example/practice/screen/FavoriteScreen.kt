@@ -91,7 +91,7 @@ fun FavoriteScreen(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(top = 16.dp),
+                    .padding(innerPadding),
             ) {
                 FavoriteVideoTutorials(navController, modifier, videoViewModel)
             }

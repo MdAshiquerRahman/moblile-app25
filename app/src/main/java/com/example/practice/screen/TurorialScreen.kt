@@ -395,25 +395,22 @@ fun LikeDislikeButtons(
                     .size(24.dp)
                     .clickable(
                         onClick = {
-//                            if (!isLiked) {
-//                                totalLikes++
-//                                if (isDisliked) {
-//                                    totalDislikes--
-//                                    isDisliked = false
-//                                }
-//                                isLiked = true
-//                            } else {
-//                                totalLikes--
-//                                isLiked = false
-//                            }
-//                            videoViewModel.updateLike(
-//                                videoId = videoId,
-//                                token = token.toString(),
-//                                onSuccess = {
-//                                    // Update UI or refresh video list
-//                                    Toast.makeText(context, "Liked successfully!", Toast.LENGTH_SHORT).show()
-//                                }
-//                            )
+                            if (!isLiked) {
+                                totalLikes++
+                                if (isDisliked) {
+                                    totalDislikes--
+                                    isDisliked = false
+                                }
+                                isLiked = true
+                            } else {
+                                totalLikes--
+                                isLiked = false
+                            }
+                            videoViewModel.likeVideo(
+                                videoId = videoId,
+                                token = token.toString(),
+                                onSuccess = {}
+                            )
 
                         }
                     )

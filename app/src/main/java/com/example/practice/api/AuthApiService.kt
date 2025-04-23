@@ -55,24 +55,25 @@ interface AuthApiService {
         @Path("video-id") videoId: Int  // Add Path annotation
     ): Response<Unit>
 
+    // Like video
+    @POST("api/videos/toggle-like/{video-id}/")
+    suspend fun likeVideo(
+        @Header("Authorization") token: String,  // Fix the variable name type
+        @Path("video-id") videoId: Int  // Add Path annotation
+    ): Response<Unit>
+
+    // Dislike video
+    @POST("api/videos/toggle-dislike/{video-id}/")
+    suspend fun dislikeVideo(
+        @Header("Authorization") token: String,  // Fix the variable name type
+        @Path("video-id") videoId: Int  // Add Path annotation
+    ): Response<Unit>
+
     // Fetch favorite videos
     @GET("api/videos/upload-videos/favorite-videos/")
     suspend fun getFavorite(
         @Header("Authorization") token: String
     ): Response<FavoriteVideos>
-
-    @POST("api/videos/{video_id}/like/")
-    suspend fun likeVideo(
-        @Header("Authorization") token: String,
-        @Path("video_id") videoId: Int
-    ): Response<Unit>
-
-    @POST("api/videos/{video_id}/dislike/")
-    suspend fun dislikeVideo(
-        @Header("Authorization") token: String,
-        @Path("video_id") videoId: Int
-    ): Response<Unit>
-
 
 
     // Fetch Comments

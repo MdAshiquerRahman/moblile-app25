@@ -42,10 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.practice.pages.post.RecipePostsCard
+import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.VideoViewModel
 
 
@@ -54,14 +56,18 @@ import com.example.practice.viewmodel.VideoViewModel
 fun HomeScreen(
     navController: NavController,
     videoViewModel: VideoViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isLoading = videoViewModel.isLoading.observeAsState(false)
     val errorMessage = videoViewModel.errorMessage.observeAsState(null)
+    val context = LocalContext.current
 
     // Fetch videos after login status is confirmed
     LaunchedEffect(Unit) {
         videoViewModel.fetchVideos()
+    }
+    LaunchedEffect(Unit) {
+        videoViewModel.fetchFavoriteVideos(token = videoViewModel.authViewModel.getToken(context).toString())
     }
 
     Scaffold(

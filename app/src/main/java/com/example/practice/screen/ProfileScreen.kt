@@ -359,9 +359,7 @@ fun PostCollectsHistoryButton() {
         FixedButton(
             text = "Posts",
             isSelected = selectedButton == "Posts",
-            onClick = {
-                selectedButton == "Collects"
-            },
+            onClick = { selectedButton == "Posts" },
             modifier = Modifier.wrapContentWidth()
         )
         FixedButton(
@@ -389,9 +387,13 @@ fun PostCollectsHistory(
 ) {
     val videoList = viewModel.videoList.observeAsState(emptyList())
     val favoriteVideoList = viewModel.favoriteVideoList.observeAsState(emptyList())
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.fetchVideos()
+    }
+    LaunchedEffect(Unit) {
+        viewModel.fetchFavoriteVideos(token = viewModel.authViewModel.getToken(context).toString())
     }
 
     LazyVerticalGrid(

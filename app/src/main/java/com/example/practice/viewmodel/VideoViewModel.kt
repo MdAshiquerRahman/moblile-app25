@@ -198,26 +198,26 @@ class VideoViewModel : ViewModel() {
         }
     }
 
-//    fun updateLike(videoId: Int, token: String, onSuccess: () -> Unit) {
-//        viewModelScope.launch {
-//            _isLoading.value = true
-//            try {
-//                val response = AuthRetrofitInstance.api.updateLike(
-//                    token = "Token $token",
-//                    videoId = videoId
-//                )
-//                if (response.isSuccessful) {
-//                    onSuccess()
-//                } else {
-//                    _errorMessage.value = "Error: ${response.code()} - ${response.message()}"
-//                }
-//            } catch (e: Exception) {
-//                _errorMessage.value = "An error occurred: ${e.localizedMessage}"
-//            } finally {
-//                _isLoading.value = false
-//            }
-//        }
-//    }
+    fun likeVideo(videoId: Int, token: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = AuthRetrofitInstance.api.likeVideo(
+                    token = "Token $token",
+                    videoId = videoId
+                )
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    _errorMessage.value = "Error: ${response.code()} - ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "An error occurred: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 //
 //    fun updateDislike(videoId: Int, token: String, onSuccess: () -> Unit) {
 //        viewModelScope.launch {
