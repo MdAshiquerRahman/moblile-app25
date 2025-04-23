@@ -9,6 +9,7 @@ import com.example.practice.api.dataclass.login.LoginRequest
 import com.example.practice.api.dataclass.login.LoginResponse
 import com.example.practice.api.dataclass.profile.ProfileResponse
 import com.example.practice.api.dataclass.signup.SignUpRequest
+import com.example.practice.api.dataclass.video.FavoriteVideos
 import com.example.practice.api.dataclass.video.UploadVideos
 import com.example.practice.api.dataclass.video.UploadVideosItem
 import okhttp3.MultipartBody
@@ -47,6 +48,18 @@ interface AuthApiService {
         @Part thumbnail: MultipartBody.Part?
     ): Response<UploadVideosItem>
 
+    // Make as favorite videos
+    @POST("api/videos/toggle-favorite/{video-id}/")
+    suspend fun makeFavorite(
+        @Header("Authorization") token: String,  // Fix the variable name type
+        @Path("video-id") videoId: Int  // Add Path annotation
+    ): Response<Unit>
+
+    // Fetch favorite videos
+    @GET("api/videos/upload-videos/favorite-videos/")
+    suspend fun getFavorite(
+        @Header("Authorization") token: String
+    ): Response<FavoriteVideos>
 
     @POST("api/videos/{video_id}/like/")
     suspend fun likeVideo(
@@ -62,6 +75,7 @@ interface AuthApiService {
 
 
 
+    // Fetch Comments
     @GET("api/videos/video-comments/")
     suspend fun getComments(): Response<Comments>
 
@@ -90,12 +104,6 @@ interface AuthApiService {
 
     @POST("auth/logout/")
     suspend fun logout(@Header("Authorization") token: String): Response<Unit>
-
-
-
-
-
-
 
 
 }

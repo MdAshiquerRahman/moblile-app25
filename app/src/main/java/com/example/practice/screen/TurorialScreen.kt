@@ -5,7 +5,6 @@ package com.example.practice.screen
 import android.content.Context
 import android.widget.Toast
 import androidx.annotation.OptIn
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +25,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -56,22 +54,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
-import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
-import androidx.media3.common.util.Log
 import com.example.practice.elements.FixedButton
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
 import com.example.practice.R
-import com.example.practice.elements.EditProfileDialog
 import com.example.practice.elements.UserCommentsCard
-import com.example.practice.viewmodel.AuthViewModel
 import com.example.practice.viewmodel.CommentViewModel
 import com.example.practice.viewmodel.VideoViewModel
-import org.w3c.dom.Comment
 
 @Composable
 fun RecipeTitle(navController: NavController,title: String) {
@@ -219,7 +212,7 @@ fun CommentSection(
     videoViewModel: VideoViewModel,
     title: String,
     description: String,
-    video_file: String,
+    videoFile: String,
     thamnail: String,
     totalLikes: Int,
     totalDislikes: Int,
@@ -235,13 +228,29 @@ fun CommentSection(
     var selectedButton by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+    val favoriteVideList = videoViewModel.favoriteVideoList.observeAsState(emptyList())
+    // For favorite icon change color
+    var isFavorite by remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     val token = viewModel.authViewModel.getToken(context)
+
+    LaunchedEffect(Unit) {
+        videoViewModel.fetchFavoriteVideos(token.toString())
+    }
+
 
     // Fetch videos after login status is confirmed
     LaunchedEffect(Unit) {
         viewModel.fetchComments()
     }
+
+    favoriteVideList.value.forEach { video ->
+        if (video.id == recipeId) {
+            isFavorite = !isFavorite
+        }
+    }
+
     if (isLoading.value) {
         CircularProgressIndicator()
     } else if (!errorMessage.value.isNullOrEmpty()) {
@@ -266,23 +275,53 @@ fun CommentSection(
                     modifier = Modifier.wrapContentWidth()
                 )
                 Spacer(modifier = Modifier.width(10.dp))
+
+//                favoriteVideList.value.forEach { vide ->
+//                    if(vide.id == recipeId){
+////                        val favorite = vide.is_favorited
+////                        var isFavorite by remember { mutableStateOf(favorite) }
+//                        Icon(
+//                            painter = painterResource(R.drawable.heart_reatc),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .clickable {
+////                                    isFavorite = !isFavorite  // Toggle favorite status
+//                                    videoViewModel.getFavoriteVideos(
+//                                        recipeId,
+//                                        token.toString(),
+//                                        onSuccess = {
+//                                            Toast.makeText(context, "Added to favorite", Toast.LENGTH_SHORT).show()
+//                                        }
+//                                    )
+//                                },
+//                            tint = Color.Red
+//                        )
+//                    }
+//                }
                 Icon(
                     painter = painterResource(R.drawable.heart_reatc),
                     contentDescription = null,
                     modifier = Modifier
-                        .clickable(
-                            onClick = {
-
-                            }
-                        )
+                        .clickable {
+                                    isFavorite = !isFavorite  // Toggle favorite status
+                            videoViewModel.getFavoriteVideos(
+                                recipeId,
+                                token.toString(),
+                                onSuccess = {
+                                    Toast.makeText(context, "Added to favorite", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        },
+                    tint = if (isFavorite) Color.Red else Color.Gray
                 )
+
                 Spacer(modifier = Modifier.width(40.dp))
                 LikeDislikeButtons(
                     videoViewModel = videoViewModel,
                     videoId = recipeId,
                     title = title,
                     description = description,
-                    video_file = video_file,
+                    video_file = videoFile,
                     thamnail = thamnail,
                     initialLikes = totalLikes,
                     initialDislikes = totalDislikes
@@ -367,14 +406,14 @@ fun LikeDislikeButtons(
 //                                totalLikes--
 //                                isLiked = false
 //                            }
-                            videoViewModel.updateLike(
-                                videoId = videoId,
-                                token = token.toString(),
-                                onSuccess = {
-                                    // Update UI or refresh video list
-                                    Toast.makeText(context, "Liked successfully!", Toast.LENGTH_SHORT).show()
-                                }
-                            )
+//                            videoViewModel.updateLike(
+//                                videoId = videoId,
+//                                token = token.toString(),
+//                                onSuccess = {
+//                                    // Update UI or refresh video list
+//                                    Toast.makeText(context, "Liked successfully!", Toast.LENGTH_SHORT).show()
+//                                }
+//                            )
 
                         }
                     )
@@ -412,14 +451,14 @@ fun LikeDislikeButtons(
 //                                isDisliked = false
 //                            }
 
-                            videoViewModel.updateDislike(
-                                videoId = videoId,
-                                token = token.toString(),
-                                onSuccess = {
-                                    // Update UI or refresh video list
-                                    Toast.makeText(context, "Disliked successfully!", Toast.LENGTH_SHORT).show()
-                                }
-                            )
+//                            videoViewModel.updateDislike(
+//                                videoId = videoId,
+//                                token = token.toString(),
+//                                onSuccess = {
+//                                    // Update UI or refresh video list
+//                                    Toast.makeText(context, "Disliked successfully!", Toast.LENGTH_SHORT).show()
+//                                }
+//                            )
                         }
                     )
             )
@@ -538,7 +577,7 @@ fun TutorialScreen(
     totalDislikes: Int,
     recipeUrl: String,
     recipeThumbnail: String,
-    recipeId: Int
+    recipeId: Int,
 ) {
     Column(
         modifier = modifier

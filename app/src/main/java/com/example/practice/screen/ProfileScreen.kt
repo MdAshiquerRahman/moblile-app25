@@ -359,7 +359,9 @@ fun PostCollectsHistoryButton() {
         FixedButton(
             text = "Posts",
             isSelected = selectedButton == "Posts",
-            onClick = { selectedButton = "Posts" },
+            onClick = {
+                selectedButton == "Collects"
+            },
             modifier = Modifier.wrapContentWidth()
         )
         FixedButton(
@@ -386,6 +388,7 @@ fun PostCollectsHistory(
     viewModel: VideoViewModel = viewModel()
 ) {
     val videoList = viewModel.videoList.observeAsState(emptyList())
+    val favoriteVideoList = viewModel.favoriteVideoList.observeAsState(emptyList())
 
     LaunchedEffect(Unit) {
         viewModel.fetchVideos()
@@ -400,6 +403,7 @@ fun PostCollectsHistory(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(videoList.value.filter { it.uploaded_by == userName }) { video ->
+            var isFavorite = favoriteVideoList.value.any{ it.id == video.id } == true
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -413,7 +417,8 @@ fun PostCollectsHistory(
                     totalDislikes = video.total_dislikes,
                     videoUrl = video.video_file,
                     videoId = video.id,
-                    thumbnailUrl = video.thamnail
+                    thumbnailUrl = video.thamnail,
+                    isFavorite = isFavorite
                 )
             }
         }
