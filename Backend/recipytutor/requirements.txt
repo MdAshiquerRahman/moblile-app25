@@ -8,8 +8,10 @@ Django==5.2
 django-allauth==65.6.0
 django-cors-headers==4.7.0
 djangorestframework==3.16.0
+gunicorn==23.0.0
 idna==3.10
 msgpack==1.1.0
+packaging==25.0
 pillow==11.1.0
 redis==5.2.1
 requests==2.32.3
