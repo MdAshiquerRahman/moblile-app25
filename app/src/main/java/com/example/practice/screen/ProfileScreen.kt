@@ -90,6 +90,8 @@ fun ProfileScreen(
     val userPass = viewModel.getPassword(context = context).orEmpty()
     val userEmail = viewModel.getEmail(context = context).orEmpty()
 
+    val videoViewModel : VideoViewModel = viewModel()
+
     // Trigger login side-effect using LaunchedEffect
     LaunchedEffect(Unit) {
         viewModel.login(userName, userEmail, userPass)
@@ -152,9 +154,7 @@ fun ProfileScreen(
                         viewModel
                     )
                     Spacer(modifier = Modifier.height(13.dp))
-                    PostCollectsHistoryButton()
-                    Spacer(modifier = Modifier.height(6.dp))
-                    PostCollectsHistory(navController, userName)
+                    PostCollectsHistoryButton(navController,userName)
                 }
             }
         )
@@ -186,6 +186,7 @@ fun DrawerContent(
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun UserNamePart(
     userName: String,
@@ -342,11 +343,15 @@ fun FillTheProfile() {
     }
 }
 
-@Preview
 @Composable
-fun PostCollectsHistoryButton() {
+fun PostCollectsHistoryButton(
+    navController: NavController,
+    userName: String,
+) {
 
     var selectedButton by remember { mutableStateOf("Posts") }
+
+    val videoViewModel: VideoViewModel = viewModel()
 
     Row(
         modifier = Modifier
@@ -359,7 +364,7 @@ fun PostCollectsHistoryButton() {
         FixedButton(
             text = "Posts",
             isSelected = selectedButton == "Posts",
-            onClick = { selectedButton == "Posts" },
+            onClick = { selectedButton = "Posts" },
             modifier = Modifier.wrapContentWidth()
         )
         FixedButton(
@@ -376,11 +381,23 @@ fun PostCollectsHistoryButton() {
         )
     }
 
+    when(selectedButton) {
+        "Posts" -> Post(navController = navController, userName = userName)
+        "Collects" -> FavoriteVideoTutorials(
+            navController = navController,
+            modifier = Modifier,
+            videoViewModel = videoViewModel,
+            false
+        )
+        //"History" -> History(navController = navController, userName = userName)
+    }
+
 }
 
 
+
 @Composable
-fun PostCollectsHistory(
+fun Post(
     navController: NavController,
     userName: String,
     viewModel: VideoViewModel = viewModel()
@@ -396,16 +413,17 @@ fun PostCollectsHistory(
         viewModel.fetchFavoriteVideos(token = viewModel.authViewModel.getToken(context).toString())
     }
 
+
     LazyVerticalGrid(
         modifier = Modifier
-            .padding(bottom = 6.dp),
+            .padding(top = 6.dp, bottom = 6.dp),
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(videoList.value.filter { it.uploaded_by == userName }) { video ->
-            var isFavorite = favoriteVideoList.value.any{ it.id == video.id } == true
+            val isFavorite = favoriteVideoList.value.any{ it.id == video.id }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -426,6 +444,105 @@ fun PostCollectsHistory(
         }
     }
 }
+
+@Composable
+fun Collections(
+    navController: NavController,
+    userName: String,
+    viewModel: VideoViewModel = viewModel()
+) {
+    val videoList = viewModel.videoList.observeAsState(emptyList())
+    val favoriteVideoList = viewModel.favoriteVideoList.observeAsState(emptyList())
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchVideos()
+    }
+    LaunchedEffect(Unit) {
+        viewModel.fetchFavoriteVideos(token = viewModel.authViewModel.getToken(context).toString())
+    }
+
+
+    LazyVerticalGrid(
+        modifier = Modifier
+            .padding(bottom = 6.dp),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items(videoList.value.filter { it.uploaded_by == userName }) { video ->
+            val isFavorite = favoriteVideoList.value.any{ it.id == video.id }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                RecipePostsCard(
+                    navController = navController,
+                    title = video.title,
+                    description = video.description.take(100), // Truncate description to 100 characters
+                    author = video.uploaded_by,
+                    totalLikes = video.total_likes,
+                    totalDislikes = video.total_dislikes,
+                    videoUrl = video.video_file,
+                    videoId = video.id,
+                    thumbnailUrl = video.thamnail,
+                    isFavorite = isFavorite
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun History(
+    navController: NavController,
+    userName: String,
+    viewModel: VideoViewModel = viewModel()
+) {
+    val videoList = viewModel.videoList.observeAsState(emptyList())
+    val favoriteVideoList = viewModel.favoriteVideoList.observeAsState(emptyList())
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchVideos()
+    }
+    LaunchedEffect(Unit) {
+        viewModel.fetchFavoriteVideos(token = viewModel.authViewModel.getToken(context).toString())
+    }
+
+
+    LazyVerticalGrid(
+        modifier = Modifier
+            .padding(bottom = 6.dp),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        items(videoList.value.filter { it.uploaded_by == userName }) { video ->
+            val isFavorite = favoriteVideoList.value.any{ it.id == video.id }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                RecipePostsCard(
+                    navController = navController,
+                    title = video.title,
+                    description = video.description.take(100), // Truncate description to 100 characters
+                    author = video.uploaded_by,
+                    totalLikes = video.total_likes,
+                    totalDislikes = video.total_dislikes,
+                    videoUrl = video.video_file,
+                    videoId = video.id,
+                    thumbnailUrl = video.thamnail,
+                    isFavorite = isFavorite
+                )
+            }
+        }
+    }
+}
+
 
 
 @Composable

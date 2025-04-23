@@ -225,7 +225,7 @@ fun CommentSection(
     val isLoading = viewModel.isLoading.observeAsState(false)
     val errorMessage = viewModel.errorMessage.observeAsState(null)
 
-    var selectedButton by remember { mutableStateOf(false) }
+    val selectedButton by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
     val favoriteVideList = videoViewModel.favoriteVideoList.observeAsState(emptyList())
@@ -276,34 +276,12 @@ fun CommentSection(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
 
-//                favoriteVideList.value.forEach { vide ->
-//                    if(vide.id == recipeId){
-////                        val favorite = vide.is_favorited
-////                        var isFavorite by remember { mutableStateOf(favorite) }
-//                        Icon(
-//                            painter = painterResource(R.drawable.heart_reatc),
-//                            contentDescription = null,
-//                            modifier = Modifier
-//                                .clickable {
-////                                    isFavorite = !isFavorite  // Toggle favorite status
-//                                    videoViewModel.getFavoriteVideos(
-//                                        recipeId,
-//                                        token.toString(),
-//                                        onSuccess = {
-//                                            Toast.makeText(context, "Added to favorite", Toast.LENGTH_SHORT).show()
-//                                        }
-//                                    )
-//                                },
-//                            tint = Color.Red
-//                        )
-//                    }
-//                }
                 Icon(
                     painter = painterResource(R.drawable.heart_reatc),
                     contentDescription = null,
                     modifier = Modifier
                         .clickable {
-                                    isFavorite = !isFavorite  // Toggle favorite status
+                            isFavorite = !isFavorite  // Toggle favorite status
                             videoViewModel.getFavoriteVideos(
                                 recipeId,
                                 token.toString(),
@@ -378,6 +356,8 @@ fun LikeDislikeButtons(
     val context = LocalContext.current
     val token = videoViewModel.authViewModel.getToken(context)
 
+
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -415,6 +395,9 @@ fun LikeDislikeButtons(
                         }
                     )
             )
+            LaunchedEffect(Unit) {
+                videoViewModel.fetchVideos()
+            }
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = totalLikes.toString(),
@@ -436,26 +419,23 @@ fun LikeDislikeButtons(
                     .size(24.dp)
                     .clickable(
                         onClick = {
-//                            if (!isDisliked) {
-//                                totalDislikes++
-//                                if (isLiked) {
-//                                    totalLikes--
-//                                    isLiked = false
-//                                }
-//                                isDisliked = true
-//                            } else {
-//                                totalDislikes--
-//                                isDisliked = false
-//                            }
+                            if (!isDisliked) {
+                                totalDislikes++
+                                if (isLiked) {
+                                    totalLikes--
+                                    isLiked = false
+                                }
+                                isDisliked = true
+                            } else {
+                                totalDislikes--
+                                isDisliked = false
+                            }
 
-//                            videoViewModel.updateDislike(
-//                                videoId = videoId,
-//                                token = token.toString(),
-//                                onSuccess = {
-//                                    // Update UI or refresh video list
-//                                    Toast.makeText(context, "Disliked successfully!", Toast.LENGTH_SHORT).show()
-//                                }
-//                            )
+                            videoViewModel.dislikeVideo(
+                                videoId = videoId,
+                                token = token.toString(),
+                                onSuccess = {}
+                            )
                         }
                     )
             )

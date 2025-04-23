@@ -93,7 +93,7 @@ fun FavoriteScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                FavoriteVideoTutorials(navController, modifier, videoViewModel)
+                FavoriteVideoTutorials(navController, modifier, videoViewModel,true)
             }
         }
     }
@@ -104,7 +104,8 @@ fun FavoriteScreen(
 fun FavoriteVideoTutorials(
     navController: NavController,
     modifier: Modifier = Modifier,
-    videoViewModel: VideoViewModel
+    videoViewModel: VideoViewModel,
+    dialog: Boolean
 ) {
     val videoList = videoViewModel.favoriteVideoList.observeAsState(emptyList())
     val isLoading = videoViewModel.isLoading.observeAsState(false) // Observing loading state
@@ -117,31 +118,33 @@ fun FavoriteVideoTutorials(
         }
     }
 
-    if (showDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDialog.value = false },
-            title = {
-                Text(text = "No Favorite Video")
-            },
-            text = {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "No videos found. Explore video to get started!")
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = "Warning Icon",
-                        modifier = modifier.size(50.dp) // Adjust size as needed
-                    )
+    if (dialog){
+        if (showDialog.value) {
+            AlertDialog(
+                onDismissRequest = { showDialog.value = false },
+                title = {
+                    Text(text = "No Favorite Video")
+                },
+                text = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "No videos found. Explore video to get started!")
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Warning Icon",
+                            modifier = modifier.size(50.dp) // Adjust size as needed
+                        )
+                    }
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        showDialog.value = false
+                        navController.navigate("home") // Navigate to the Post Screen
+                    }) {
+                        Text(text = "Explore Videos")
+                    }
                 }
-            },
-            confirmButton = {
-                Button(onClick = {
-                    showDialog.value = false
-                    navController.navigate("home") // Navigate to the Post Screen
-                }) {
-                    Text(text = "Explore Videos")
-                }
-            }
-        )
+            )
+        }
     }
 
     LazyVerticalGrid(
@@ -151,7 +154,7 @@ fun FavoriteVideoTutorials(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(videoList.value) { video ->
-            val isFavorite = videoList.value.any{ it.id == video.id } == true
+            val isFavorite = videoList.value.any{ it.id == video.id }
             Box(
                 modifier = Modifier
                     .height(250.dp) // Set a fixed height for grid items

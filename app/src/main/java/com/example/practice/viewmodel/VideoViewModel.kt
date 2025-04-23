@@ -218,6 +218,27 @@ class VideoViewModel : ViewModel() {
             }
         }
     }
+
+    fun dislikeVideo(videoId: Int, token: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = AuthRetrofitInstance.api.dislikeVideo(
+                    token = "Token $token",
+                    videoId = videoId
+                )
+                if (response.isSuccessful) {
+                    onSuccess()
+                } else {
+                    _errorMessage.value = "Error: ${response.code()} - ${response.message()}"
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "An error occurred: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 //
 //    fun updateDislike(videoId: Int, token: String, onSuccess: () -> Unit) {
 //        viewModelScope.launch {

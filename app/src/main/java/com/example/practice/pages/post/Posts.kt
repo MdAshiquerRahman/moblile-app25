@@ -59,7 +59,7 @@ fun RecipePostsCard(
     totalDislikes: Int,
     videoUrl: String,
     videoId: Int,
-    thumbnailUrl: String,
+    thumbnailUrl: String?,
     isFavorite: Boolean
 ) {
     val context = LocalContext.current
