@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.practice.api.AuthRetrofitInstance
-import com.example.practice.api.LoginRequest
-import com.example.practice.api.SignUpRequest
 import androidx.core.content.edit
-import com.example.practice.api.ProfileResponse
+import com.example.practice.api.dataclass.login.LoginRequest
+import com.example.practice.api.dataclass.profile.ProfileResponse
+import com.example.practice.api.dataclass.signup.SignUpRequest
 import com.example.practice.repository.SharedPreferencesHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,6 +37,7 @@ class AuthViewModel : ViewModel() {
 
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+
 
 
     fun signUp(username: String, email: String, password1: String, password2: String) {
@@ -117,22 +118,48 @@ class AuthViewModel : ViewModel() {
 
 
 
-
-
-
-
     fun logout(context: Context) {
         viewModelScope.launch {
-            // Clear the saved token from SharedPreferences
-            val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit { remove("auth_token") }
+            isLoading = true
+            try {
+                // Retrieve the token
+                val savedToken = token
+                Log.d("TOKEN", "Token: $savedToken") // Debugging log
 
-            // Update the login state
-            _isLoggedIn.value = false
-            token = null
-            profile = null
+                if (!savedToken.isNullOrEmpty()) {
+                    // Make the API call to logout
+                    val response = AuthRetrofitInstance.api.logout("Token $savedToken")
+                    if (response.isSuccessful) {
+                        // Clear the token from SharedPreferences
+                        val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit { clear() }
+
+                        // Update login state
+                        _isLoggedIn.value = false
+                        token = null
+                        profile = null
+
+                        Log.d("LOGOUT", "Successfully logged out")
+                    } else {
+                        Log.e("LOGOUT", "Logout failed: ${response.code()} - ${response.message()}")
+                        errorMessage = response.errorBody()?.string() ?: "Logout failed"
+                    }
+                } else {
+                    Log.e("LOGOUT", "No token found, cannot log out")
+                    errorMessage = "No token found"
+                }
+            } catch (e: Exception) {
+                Log.e("LOGOUT", "Error during logout: ${e.localizedMessage}")
+                errorMessage = "An error occurred: ${e.localizedMessage}"
+            } finally {
+                isLoading = false
+            }
         }
     }
+
+
+
+
 
 
     fun saveUsername(context: Context, username: String) {

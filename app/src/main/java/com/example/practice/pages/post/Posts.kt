@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ fun RecipePostsCard(
     description: String,
     author: String,
     totalLikes: Int,
+    totalDislikes: Int,
     videoUrl: String,
     videoId: Int,
     thumbnailUrl: String
@@ -58,8 +60,7 @@ fun RecipePostsCard(
             .clickable(
                 onClick = {
                     // Navigate to the tutorial screen
-                    navController.navigate("tutorial/$title/${Uri.encode(videoUrl)}/$videoId")
-                    Log.e("VideoId", videoId.toString())
+                    navController.navigate("tutorial/$title/$description/$author/$totalLikes/$totalDislikes/${Uri.encode(videoUrl)}/${Uri.encode(thumbnailUrl)}/$videoId")
                 }
             ),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -75,7 +76,8 @@ fun RecipePostsCard(
                     .crossfade(true)
                     .build(),
                 contentDescription = "Profile_Picture",
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -134,11 +136,23 @@ fun RecipePostsCard(
                     painter = painterResource(R.drawable.heart_reatc),
                     contentDescription = null
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 // total likes
                 Text(
                     text = "$totalLikes",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = FontFamily(Font(R.font.source_code_pro_regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF212121),
+                        textAlign = TextAlign.Center,
+                    )
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "$totalDislikes",
                     style = TextStyle(
                         fontSize = 16.sp,
                         lineHeight = 20.sp,

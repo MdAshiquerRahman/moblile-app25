@@ -17,6 +17,11 @@ urlpatterns = [
     path('api/profile/', include('users.api_urls')),
 ]
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 # ======= ADD THIS PART TO HANDLE MEDIA FILES IN DEVELOPMENT ======= #
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,10 +1,19 @@
 package com.example.practice.api
 
-import com.example.practice.viewmodel.CommentItem
-import com.example.practice.viewmodel.CommentPostRequest
-import com.example.practice.viewmodel.Comments
+
+import com.example.practice.api.dataclass.comment.CommentRequest
+import com.example.practice.api.dataclass.comment.CommentResponse
+import com.example.practice.api.dataclass.comment.Comments
+import com.example.practice.api.dataclass.likedislike.LikeDislikeRequest
+import com.example.practice.api.dataclass.login.LoginRequest
+import com.example.practice.api.dataclass.login.LoginResponse
+import com.example.practice.api.dataclass.profile.ProfileResponse
+import com.example.practice.api.dataclass.signup.SignUpRequest
+import com.example.practice.api.dataclass.video.UploadVideos
+import com.example.practice.api.dataclass.video.UploadVideosItem
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -13,14 +22,9 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 
 interface AuthApiService {
-
-//    @GET("api/profile/update/")
-//    suspend fun getProfile(
-//        @Header("Authorization") token: String
-//    ): Response<ProfileResponse>
-
 
     @POST("auth/registration/")
     suspend fun registerUser(@Body request: SignUpRequest): Response<Unit>
@@ -28,8 +32,35 @@ interface AuthApiService {
     @POST("auth/login/")
     suspend fun login(@Body request: LoginRequest): LoginResponse
 
-    @GET("api/videos/upload_videos/")
+
+
+    @GET("api/videos/upload-videos/")
     suspend fun getVideos(): Response<UploadVideos>
+
+    @Multipart
+    @POST("api/videos/upload-videos/")
+    suspend fun uploadVideo(
+        @Header("Authorization") token: String,
+        @Part("title") title: RequestBody,
+        @Part("description") description: RequestBody,
+        @Part video: MultipartBody.Part?,
+        @Part thumbnail: MultipartBody.Part?
+    ): Response<UploadVideosItem>
+
+
+    @POST("api/videos/{video_id}/like/")
+    suspend fun likeVideo(
+        @Header("Authorization") token: String,
+        @Path("video_id") videoId: Int
+    ): Response<Unit>
+
+    @POST("api/videos/{video_id}/dislike/")
+    suspend fun dislikeVideo(
+        @Header("Authorization") token: String,
+        @Path("video_id") videoId: Int
+    ): Response<Unit>
+
+
 
     @GET("api/videos/video-comments/")
     suspend fun getComments(): Response<Comments>
@@ -37,8 +68,9 @@ interface AuthApiService {
     @POST("api/videos/video-comments/")
     suspend fun postComment(
         @Header("Authorization") token: String,
-        @Body comment: CommentPostRequest
-    ): Response<CommentItem>
+        @Body comment: CommentRequest
+    ): Response<CommentResponse>
+
 
 
     @GET("api/profile/update/")
@@ -51,9 +83,23 @@ interface AuthApiService {
         @Header("Authorization") token: String,
         @Part("username") username: RequestBody,
         @Part("email") email: RequestBody,
-        @Part profile_picture: MultipartBody.Part? = null,
+        @Part profile_picture: MultipartBody.Part? = null, // No part name here
         @Part("UserId") userId: RequestBody? = null
     ): ProfileResponse
+
+
+
+
+
+
+    @POST("auth/logout/")
+    suspend fun logout(@Header("Authorization") token: String): Response<Unit>
+
+
+
+
+
+
 
 
 }
